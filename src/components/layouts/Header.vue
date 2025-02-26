@@ -1,13 +1,12 @@
 <template>
-  <header>
-    <div class="logo">
-      logo
-      <!-- <img src="@/assets/logo.png" alt="Logo" /> -->
+  <header class="header">
+    <div class="header__logo">
+      <img src="@/assets/logo.svg" alt="Logo" />
     </div>
-    <div class="nav">
-      <button @click="goToHelp">Помощь</button>
-      <button @click="goToAbout">О проекте</button>
-      <button @click="goToAuth">Auth</button>
+    <div class="header__nav">
+      <Button @click="goToHelp">Помощь</button>
+      <Button @click="goToAbout">О проекте</button>
+      <Button @click="goToAuth">Auth</button>
     </div>
   </header>
 </template>
@@ -15,6 +14,7 @@
 
 <script setup lang="ts">
 import router from '@/router';
+import { Button } from 'ant-design-vue';
 const goToHelp = () => {
 
 }
@@ -26,31 +26,28 @@ const goToAuth = () => {
 }
 </script>
 
-<style scoped>
-header {
+<style lang="scss" scoped>
+.header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background-color: #333;
   padding: 20px;
-  color: white;
-  min-height: 10vh;
-}
+  background-color: var(--color-black);
+  color:  var(--color-white);
+  position: fixed;
+  width: 100%;
+  height: 60px;
+  z-index: 2;
+  &__logo {
 
-.logo img {
-  height: 50px;
-}
+    img {
+      height: 50px;
+    }
+  }
 
-.nav button {
-  background-color: #007bff;
-  color: white;
-  border: none;
-  padding: 10px;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.nav button:hover {
-  background-color: #0056b3;
+  &__nav {
+    display: flex;
+    gap: 8px;
+  }
 }
 </style>

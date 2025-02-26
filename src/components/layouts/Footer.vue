@@ -1,7 +1,7 @@
 <template>
-  <footer>
-    <div class="footer-content">
-      <p>&copy; 2025 AIM Project. Все права защищены.</p>
+  <footer class="footer">
+    <div class="footer__content">
+      <p>AIM V1.0</p>
       <div class="links">
         <a href="/privacy-policy">Политика конфиденциальности</a>
         <a href="/terms-of-service">Пользовательское соглашение</a>
@@ -14,27 +14,41 @@
 
 </script>
 
-<style scoped>
-footer {
-  background-color: #333;
-  color: white;
-  padding: 20px;
-  text-align: center;
-  min-height: 10vh;
-}
+<style lang="scss" scoped>
+.footer {
+  // background-color: var(--color-black);
+  background-color: #000;
+  color: var(--color-white);
+  padding: 0 12px;
+  min-height: 5vh;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 
-.footer-content {
-  max-width: 1200px;
-  margin: 0 auto;
-}
+  &__content {
+    height: inherit;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
 
-.footer-content .links a {
-  margin-left: 20px;
-  color: #fff;
-  text-decoration: none;
-}
+    p {
+      display: flex;
+      align-items: center;
+      margin: 0;
+    }
+  }
 
-.footer-content .links a:hover {
-  text-decoration: underline;
+  .links {
+    a {
+      margin-left: 20px;
+      color: var(--color-white);
+      text-decoration: none;
+
+      &:hover {
+        text-decoration: underline;
+      }
+    }
+  }
 }
 </style>

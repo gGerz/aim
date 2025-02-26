@@ -8,7 +8,12 @@ import router from './router'
 
 const app = createApp(App)
 
+import Antd from 'ant-design-vue';
+import 'ant-design-vue/dist/reset.css';
+
 app.use(createPinia())
 app.use(router)
+app.use(Antd)
+
 
 app.mount('#app')
