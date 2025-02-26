@@ -1,13 +1,13 @@
 <template>
   <div class="home-view">
     <div class="home-view__content">
-      <Button>Начать работу</Button>
+      <AimButton size="extra-big" class="home-view__button">Начать работу</AimButton>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button } from 'ant-design-vue';
+import AimButton from '@/ui/buttons/AimButton.vue';
 </script>
 
 <style lang="scss">
@@ -38,6 +38,9 @@ import { Button } from 'ant-design-vue';
     display: flex;
     justify-content: center;
     align-items: center;
+  }
+  &__button {
+    max-width: 450px;
   }
 }
 </style>

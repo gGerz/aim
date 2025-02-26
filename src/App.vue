@@ -1,15 +1,22 @@
 <template>
-  <div>
+  <ConfigProvider
+    :theme="{
+        token: {
+          colorTextBase: '#333', // Цвет текста по умолчанию
+          colorPrimary: '#ffcb9b',
+        },
+      }"
+  >
     <Header />
     <main>
       <router-view></router-view>
     </main>
     <Footer />
-  </div>
+  </ConfigProvider>
 </template>
 
 <script lang="ts" setup>
-
+import { ConfigProvider } from 'ant-design-vue';
 import Header from '@/components/layouts/Header.vue';
 import Footer from '@/components/layouts/Footer.vue';
 </script>

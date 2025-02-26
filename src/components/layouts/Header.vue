@@ -4,9 +4,9 @@
       <img src="@/assets/logo.svg" alt="Logo" />
     </div>
     <div class="header__nav">
-      <Button @click="goToHelp">Помощь</button>
-      <Button @click="goToAbout">О проекте</button>
-      <Button @click="goToAuth">Auth</button>
+      <AimButton @click="goToHelp">Помощь</AimButton>
+      <AimButton @click="goToAbout">О проекте</AimButton>
+      <AimButton @click="goToAuth">Auth</AimButton>
     </div>
   </header>
 </template>
@@ -14,7 +14,7 @@
 
 <script setup lang="ts">
 import router from '@/router';
-import { Button } from 'ant-design-vue';
+import AimButton from '@/ui/buttons/AimButton.vue';
 const goToHelp = () => {
 
 }
@@ -31,7 +31,7 @@ const goToAuth = () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 20px;
+  padding: 0 20px;
   background-color: var(--color-black);
   color:  var(--color-white);
   position: fixed;
@@ -41,7 +41,7 @@ const goToAuth = () => {
   &__logo {
 
     img {
-      height: 50px;
+      height: 40px;
     }
   }
 

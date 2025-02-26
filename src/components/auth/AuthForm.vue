@@ -10,15 +10,16 @@
         <span>Пароль</span>
         <InputPassword placeholder="Введите пароль"/>
       </label>
-      <Button class="auth-form__button" @click="onAuthClick">Войти</Button>
+      <AimButton size="big" class="auth-form__button" @click="onAuthClick">Войти</AimButton>
     </Card>
     <p class="auth-form__subtext">Версия ОС: Windows 10 и выше</p>
   </div>
 </template>
 
 <script lang="ts" setup>
-import { Button, Card, Input, InputPassword } from 'ant-design-vue';
+import { Card, Input, InputPassword } from 'ant-design-vue';
 import router from '@/router';
+import AimButton from '@/ui/buttons/AimButton.vue';
 const onAuthClick = () => {
   router.push('/')
 }
@@ -97,10 +98,6 @@ const onAuthClick = () => {
 
   &__button {
     margin: 8px 0 0 0;
-    height: 55px;
-    border-radius: 14px;
-    font-size: 18px;
-    font-weight: 600;
   }
 
   &__subtext {
