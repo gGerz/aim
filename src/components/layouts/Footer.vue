@@ -19,7 +19,7 @@
   // background-color: var(--color-black);
   background-color: #000;
   color: var(--color-white);
-  padding: 0 12px;
+  padding: 0 20px;
   min-height: 5vh;
   display: flex;
   justify-content: space-between;

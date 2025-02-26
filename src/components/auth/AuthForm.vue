@@ -10,7 +10,7 @@
         <span>Пароль</span>
         <InputPassword placeholder="Введите пароль"/>
       </label>
-      <AimButton size="big" class="auth-form__button" @click="onAuthClick">Войти</AimButton>
+      <AimButton :loading="isLoading" size="big" class="auth-form__button" @click="onAuthClick">Войти</AimButton>
     </Card>
     <p class="auth-form__subtext">Версия ОС: Windows 10 и выше</p>
   </div>
@@ -20,8 +20,15 @@
 import { Card, Input, InputPassword } from 'ant-design-vue';
 import router from '@/router';
 import AimButton from '@/ui/buttons/AimButton.vue';
+import { ref } from 'vue';
+
+const isLoading = ref(false)
+
 const onAuthClick = () => {
-  router.push('/')
+  isLoading.value = true
+  setTimeout(() => {
+    router.push('/')
+  }, 2000)
 }
 
 </script>
