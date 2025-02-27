@@ -32,7 +32,8 @@ const goToAuth = () => {
   justify-content: space-between;
   align-items: center;
   padding: 0 20px;
-  background-color: var(--color-black);
+  // background-color: var(--color-black);
+  background-color: rgba(43, 52, 49, 0.5);
   color:  var(--color-white);
   position: fixed;
   width: 100%;

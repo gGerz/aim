@@ -1,13 +1,19 @@
 <template>
   <div class="home-view">
     <div class="home-view__content">
-      <AimButton size="extra-big" class="home-view__button">Начать работу</AimButton>
+      <AimButton size="extra-big" class="home-view__button" @click="onStartClick">Начать работу</AimButton>
     </div>
   </div>
 </template>
 
 <script lang="ts" setup>
+import router from '@/router';
 import AimButton from '@/ui/buttons/AimButton.vue';
+
+const onStartClick = () => {
+  router.push('/workspace')
+}
+
 </script>
 
 <style lang="scss">
