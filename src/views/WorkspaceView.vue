@@ -53,7 +53,7 @@ import { Card } from 'ant-design-vue';
   }
 
   &__grid {
-    margin: 100px 0 0 0;
+    margin: 20px 0 0 0;
     display: flex;
     flex-direction: column;
     gap: 20px;

@@ -28,6 +28,7 @@ main {
   display: flex;
 
   & > :first-child {
+    padding: 60px 0 20px;
     flex-grow: 1;
   }
 }
