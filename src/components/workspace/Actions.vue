@@ -1,9 +1,9 @@
 <template>
   <div class="actions">
-    <AimButton>Мои черновики</AimButton>
-    <AimButton>Сохранить черновик</AimButton>
-    <AimButton>Очистить историю</AimButton>
-    <AimButton>Перезапуск</AimButton>
+    <AimButton size="big" color="cyan">Мои черновики</AimButton>
+    <AimButton size="big" color="cyan">Очистить историю</AimButton>
+    <AimButton size="big" color="cyan">Сохранить черновик</AimButton>
+    <AimButton size="big" color="cyan">Перезапуск</AimButton>
   </div>
 </template>
 <script lang="ts" setup>

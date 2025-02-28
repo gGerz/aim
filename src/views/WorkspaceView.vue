@@ -49,6 +49,7 @@ import { Card } from 'ant-design-vue';
     display: flex;
     flex-direction: column;
     max-width: 1200px;
+    padding: 0 20px;
     margin: 0 auto;
   }
 
@@ -63,6 +64,10 @@ import { Card } from 'ant-design-vue';
     display: grid;
     gap: 20px;
     grid-template-columns: 2fr 1fr;
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+    }
   }
 
   &__button {

@@ -45,7 +45,7 @@ const onAuthClick = () => {
     background-color: var(--color-cyan);
     max-width: 400px;
     width: 100%;
-    border-color: var(--color-orange);
+    border-color: transparent;
     border-radius: 20px;
 
     ::v-deep(.ant-card-body) {

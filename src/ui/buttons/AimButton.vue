@@ -13,7 +13,7 @@ import { withDefaults } from 'vue';
 
 withDefaults(defineProps<{
   size?: 'small' | 'medium' | 'big' | 'extra-big',
-  color?: 'orange',
+  color?: 'orange' | 'cyan',
   isFullWidth?: boolean
 }>(),
 {
@@ -35,6 +35,16 @@ withDefaults(defineProps<{
 
     &:hover {
       color: rgb(84 84 84 / 68%);
+    }
+  }
+
+
+  &--cyan {
+    background-color: var(--color-cyan);
+    color: var(--color-white);
+
+    &:hover {
+      color: rgba(255, 255, 255, 0.68);
     }
   }
 

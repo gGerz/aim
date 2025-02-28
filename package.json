@@ -13,6 +13,7 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
+    "@ant-design/icons-vue": "^7.0.1",
     "@primeuix/themes": "^1.0.0",
     "ant-design-vue": "^4.2.6",
     "pinia": "^2.3.1",
