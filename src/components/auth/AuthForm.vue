@@ -1,34 +1,73 @@
 <template>
-  <div class="auth-form">
+  <form class="auth-form">
     <Card class="auth-form__card">
       <h2 class="auth-form__title">Авторизация</h2>
       <label class="auth-form__input">
         <span>Имя пользователя</span>
-        <Input placeholder="Введите имя пользователя"/>
+        <Input v-model:value="authForm.userName" name="login" placeholder="Введите имя пользователя"/>
       </label>
       <label class="auth-form__input-password">
         <span>Пароль</span>
-        <InputPassword placeholder="Введите пароль"/>
+        <InputPassword v-model:value="authForm.password"  name="password" placeholder="Введите пароль"/>
       </label>
-      <AimButton :loading="isLoading" size="big" class="auth-form__button" @click="onAuthClick">Войти</AimButton>
+      <AimButton
+        :disabled="isButtonDisabled"
+        :loading="isLoading" size="big"
+        class="auth-form__button"
+        @click="onAuthClick"
+      >Войти</AimButton>
     </Card>
     <p class="auth-form__subtext">Версия ОС: Windows 10 и выше</p>
-  </div>
+  </form>
 </template>
 
 <script lang="ts" setup>
 import { Card, Input, InputPassword } from 'ant-design-vue';
 import router from '@/router';
+import { notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
-import { ref } from 'vue';
+import { nextTick, ref } from 'vue';
+import http from '@/services/http';
+import { computed } from 'vue';
+import { useAuthStore } from '@/store/authStore';
+
+const authStore = useAuthStore();
 
 const isLoading = ref(false)
+const authForm = ref({
+  userName: 'testuser',
+  password: 'Asdf2020'
+})
+
+const isButtonDisabled = computed(() => !authForm.value.password || !authForm.value.userName)
 
 const onAuthClick = () => {
   isLoading.value = true
-  setTimeout(() => {
+  http.post('login/', {
+    username: authForm.value.userName,
+    password: authForm.value.password,
+  }).then((res) => {
+    authStore.login({
+      access: res.data.access,
+      refresh: res.data.refresh,
+    })
     router.push('/')
-  }, 2000)
+  }).catch((err) => {
+    notification.error({
+      message: err.response.data.error,
+      description: 'Попробуйте ввести другой логин или пароль'
+    })
+  }).finally(() => {
+    authStore.login({
+      access: 'kek',
+      refresh: 'mek'
+    })
+    nextTick(() => {
+      router.push('/')
+    })
+    isLoading.value = false
+
+  })
 }
 
 </script>

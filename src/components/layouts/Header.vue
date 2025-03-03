@@ -6,7 +6,7 @@
     <div class="header__nav">
       <AimButton @click="goToHelp">Помощь</AimButton>
       <AimButton @click="goToAbout">О проекте</AimButton>
-      <AimButton @click="goToAuth">Auth</AimButton>
+      <AimButton v-if="authStore.isAuthenticated" @click="onLogout">Logout</AimButton>
     </div>
   </header>
 </template>
@@ -15,13 +15,18 @@
 <script setup lang="ts">
 import router from '@/router';
 import AimButton from '@/ui/buttons/AimButton.vue';
+import { useAuthStore } from '@/store/authStore';
+
+const authStore = useAuthStore()
+
 const goToHelp = () => {
 
 }
 const goToAbout = () => {
 
 }
-const goToAuth = () => {
+const onLogout = () => {
+  authStore.logout()
   router.push('/auth')
 }
 </script>
