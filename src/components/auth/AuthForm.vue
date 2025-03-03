@@ -59,8 +59,8 @@ const onAuthClick = () => {
     })
   }).finally(() => {
     authStore.login({
-      access: 'kek',
-      refresh: 'mek'
+      access: 'kek1',
+      refresh: 'mek1'
     })
     nextTick(() => {
       router.push('/')
