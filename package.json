@@ -10,7 +10,8 @@
     "build-only": "vite build",
     "type-check": "vue-tsc --build",
     "lint": "eslint . --fix",
-    "format": "prettier --write src/"
+    "format": "prettier --write src/",
+    "public": "git subtree push --prefix dist origin gh-pages"
   },
   "dependencies": {
     "@ant-design/icons-vue": "^7.0.1",
