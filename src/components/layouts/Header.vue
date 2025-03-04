@@ -16,7 +16,8 @@
 import router from '@/router';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { useAuthStore } from '@/store/authStore';
-
+import http from '@/services/http';
+import Cookies from 'js-cookie';
 const authStore = useAuthStore()
 
 const goToHelp = () => {
@@ -26,8 +27,13 @@ const goToAbout = () => {
 
 }
 const onLogout = () => {
-  authStore.logout()
-  router.push('/auth')
+  http.post('logout/', {
+    access: Cookies.get('access_token'),
+    refresh: Cookies.get('refresh_token')
+  }).then(() => {
+    authStore.logout()
+    router.push('/auth')
+  })
 }
 </script>
 

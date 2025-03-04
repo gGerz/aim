@@ -58,6 +58,21 @@
           </div>
         </label>
       </div>
+      <div class="constructor__row">
+        <label class="constructor__sizes">
+          <span>Введите диаметр</span>
+          <div class="constructor__size-inputs">
+            <InputNumber class="">
+            <template #addonBefore>
+              Ø
+            </template>
+            <template #addonAfter>
+              mm
+            </template>
+          </InputNumber>
+          </div>
+        </label>
+      </div>
     </div>
     <UploadDragger class="constructor__file">
       Прикрепите STL-Модель

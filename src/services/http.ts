@@ -71,7 +71,6 @@ class ApiService {
     )
   }
 
-  // Метод для обновления токенов
   private async refreshToken(): Promise<Tokens | null> {
     try {
       const refreshToken = Cookies.get('refresh_token')
@@ -86,7 +85,7 @@ class ApiService {
         },
       )
 
-      return response.data // Возвращаем новые токены
+      return response.data
     } catch (error) {
       console.error('Ошибка при запросе нового токена:', error)
       throw error
@@ -105,7 +104,6 @@ class ApiService {
     return this.api.put<T>(url, data, config)
   }
 
-  // Метод для выполнения DELETE запроса
   public delete<R>(url: string, config: AxiosRequestConfig = {}): Promise<AxiosResponse<R>> {
     return this.api.delete<R>(url, config)
   }

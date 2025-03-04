@@ -35,8 +35,8 @@ const authStore = useAuthStore();
 
 const isLoading = ref(false)
 const authForm = ref({
-  userName: 'testuser',
-  password: 'Asdf2020'
+  userName: 'german',
+  password: '123456qW!'
 })
 
 const isButtonDisabled = computed(() => !authForm.value.password || !authForm.value.userName)
@@ -51,20 +51,15 @@ const onAuthClick = () => {
       access: res.data.access,
       refresh: res.data.refresh,
     })
-    router.push('/')
+    nextTick(() => {
+      router.push('/')
+    })
   }).catch((err) => {
     notification.error({
       message: err.response.data.error,
       description: 'Попробуйте ввести другой логин или пароль'
     })
   }).finally(() => {
-    authStore.login({
-      access: 'kek1',
-      refresh: 'mek1'
-    })
-    nextTick(() => {
-      router.push('/')
-    })
     isLoading.value = false
 
   })
