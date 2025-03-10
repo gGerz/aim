@@ -5,9 +5,7 @@
         <Actions/>
         <div class="workspace-view__row">
           <Constructor/>
-          <Card title="Диалог">
-            Здесь будет диалог
-          </Card>
+          <ChatWindow/>
         </div>
       </div>
     </div>
@@ -17,7 +15,7 @@
 <script lang="ts" setup>
 import Actions from '@/components/workspace/Actions.vue';
 import Constructor from '@/components/workspace/Constructor.vue';
-import { Card } from 'ant-design-vue';
+import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 
 </script>
 
@@ -63,7 +61,7 @@ import { Card } from 'ant-design-vue';
   &__row {
     display: grid;
     gap: 20px;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 2fr minmax(420px, 1fr);
 
     @media (max-width: 960px) {
       grid-template-columns: 1fr;
