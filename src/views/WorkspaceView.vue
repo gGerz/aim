@@ -10,11 +10,21 @@
           </div>
         </template>
         <div class="workspace-view__second" v-if="currentStep === 2">
-          <Tools  @on-back-click="goToPrevStep"/>
+          <Tools  @on-back-click="goToPrevStep"  @on-start-click="showModal"/>
           <ModelViewer/>
         </div>
       </div>
     </div>
+    <Modal v-model:open="open" title="Предупреждение!">
+      <p>Дальнейшие действия вы выполняете под свою ответственность! Неправильно указанные данные или отсутствие в указанных позициях рекомендуемого инструмента
+        может повлечь за собой снижение качества исполнения детали и времени её изготовления, а также
+        к  неисправности станка или поломке инструмента.
+      </p>
+       <template #footer>
+        <AimButton :is-full-width="false" color="cyan">Назад</AimButton>
+        <AimButton :is-full-width="false" color="orange">Принять</AimButton>
+       </template>
+    </Modal>
   </div>
 </template>
 
@@ -25,7 +35,8 @@ import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 import Tools from '@/components/workspace/Tools.vue';
 import ModelViewer from '@/components/workspace/ModelViewer.vue';
 import { ref } from 'vue';
-
+import { Modal } from 'ant-design-vue';
+import AimButton from '@/ui/buttons/AimButton.vue';
 const currentStep = ref(1)
 
 const goToNextStep = () => {
@@ -35,6 +46,17 @@ const goToNextStep = () => {
 const goToPrevStep = () => {
   currentStep.value = 1
 }
+
+const open = ref<boolean>(false);
+
+const showModal = () => {
+  open.value = true;
+};
+
+const handleOk = (e: MouseEvent) => {
+  console.log(e);
+  open.value = false;
+};
 
 </script>
 

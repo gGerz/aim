@@ -6,7 +6,7 @@
     <div class="header__nav">
       <AimButton @click="goToHelp">Помощь</AimButton>
       <AimButton @click="goToAbout">О проекте</AimButton>
-      <AimButton v-if="authStore.isAuthenticated" @click="onLogout">Logout</AimButton>
+      <AimButton v-if="authStore.isAuthenticated" @click="onLogout">Выйти</AimButton>
     </div>
   </header>
 </template>
