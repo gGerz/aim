@@ -77,7 +77,7 @@
     <UploadDragger class="constructor__file">
       Прикрепите STL-Модель
     </UploadDragger>
-    <AimButton class="constructor__button" size="big">Старт</AimButton>
+    <AimButton class="constructor__button" size="big" @click="onStartClick">Старт</AimButton>
   </Card>
 </template>
 <script lang="ts" setup>
@@ -86,9 +86,18 @@ import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup } from 'ant-d
 import { ref } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
+type Emits = {
+  'on-start-click': []
+}
+const emit = defineEmits<Emits>()
+
 
 const machineType = ref<string>('a');
 const standType = ref<string>('2');
+
+const onStartClick = () => {
+  emit('on-start-click')
+}
 
 </script>
 <style lang="scss" scoped>

@@ -2,10 +2,16 @@
   <div class="workspace-view">
     <div class="workspace-view__content">
       <div class="workspace-view__grid">
-        <Actions/>
-        <div class="workspace-view__row">
-          <Constructor/>
-          <ChatWindow/>
+        <template v-if="currentStep === 1">
+          <Actions/>
+          <div class="workspace-view__first">
+            <Constructor @on-start-click="goToNextStep"/>
+            <ChatWindow/>
+          </div>
+        </template>
+        <div class="workspace-view__second" v-if="currentStep === 2">
+          <Tools  @on-back-click="goToPrevStep"/>
+          <ModelViewer/>
         </div>
       </div>
     </div>
@@ -16,6 +22,19 @@
 import Actions from '@/components/workspace/Actions.vue';
 import Constructor from '@/components/workspace/Constructor.vue';
 import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
+import Tools from '@/components/workspace/Tools.vue';
+import ModelViewer from '@/components/workspace/ModelViewer.vue';
+import { ref } from 'vue';
+
+const currentStep = ref(1)
+
+const goToNextStep = () => {
+  currentStep.value = 2
+}
+
+const goToPrevStep = () => {
+  currentStep.value = 1
+}
 
 </script>
 
@@ -58,10 +77,20 @@ import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
     gap: 20px;
   }
 
-  &__row {
+  &__first {
     display: grid;
     gap: 20px;
     grid-template-columns: 2fr minmax(420px, 1fr);
+
+    @media (max-width: 960px) {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  &__second {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: 1fr 1fr;
 
     @media (max-width: 960px) {
       grid-template-columns: 1fr;
