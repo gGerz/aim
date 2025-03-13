@@ -5,8 +5,11 @@
 </template>
 
 <script setup lang="ts">
-defineProps({ message: Object });
+import type { IMessage } from '@/types/messages';
+
+defineProps<{ message: IMessage }>();
 </script>
+
 
 <style lang="scss" scoped>
 .message-item {

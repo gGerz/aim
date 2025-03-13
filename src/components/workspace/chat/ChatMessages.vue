@@ -7,8 +7,8 @@
 <script lang="ts" setup>
 import { nextTick, ref, watch } from 'vue';
 import MessageItem from './MessageItem.vue';
-const props = defineProps({ messages: Array });
-
+import type { IMessage } from '@/types/messages';
+const props = defineProps<{ messages: IMessage[] }>();
 const messagesContainer = ref<HTMLElement | null>(null);
 
 watch(() => props.messages, async () => {

@@ -17,13 +17,14 @@ import ChatMessages from './ChatMessages.vue';
 import ChatInput from './ChatInput.vue';
 import { Card } from 'ant-design-vue';
 import { RobotOutlined } from '@ant-design/icons-vue';
+import type { IMessage } from '@/types/messages';
 
-const messages = ref([
+const messages = ref<IMessage[]>([
   { id: 1, text: 'Привет! Я робот, не бойся меня, я друг! Я тебя не обижу, давай сидеть и смотреть друг другу в глаза. Спроси меня любой вопрос и я постараюсь тебе на него ответить!', sender: 'bot' },
   { id: 2, text: 'Как дела?', sender: 'user' },
 ]);
 
-const handleSendMessage = (message) => {
+const handleSendMessage = (message: string) => {
   messages.value.push({ id: Date.now(), text: message, sender: 'user' });
 };
 </script>
