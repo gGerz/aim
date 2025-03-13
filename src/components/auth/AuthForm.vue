@@ -43,6 +43,14 @@ const isButtonDisabled = computed(() => !authForm.value.password || !authForm.va
 
 const onAuthClick = () => {
   isLoading.value = true
+
+  // http.post('register/', {
+  //   username: authForm.value.userName,
+  //   email: 'testing@mail.ru',
+  //   password: authForm.value.password,
+  //   password2: authForm.value.password,
+  // })
+
   http.post('login/', {
     username: authForm.value.userName,
     password: authForm.value.password,
@@ -51,9 +59,9 @@ const onAuthClick = () => {
       access: res.data.access,
       refresh: res.data.refresh,
     })
-    nextTick(() => {
+    setTimeout(() => {
       router.push('/')
-    })
+    }, 0)
   }).catch((err) => {
     notification.error({
       message: err.response.data.error,
