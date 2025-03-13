@@ -8,7 +8,6 @@ interface AuthState {
 type TokenType = 'access' | 'refresh'
 
 const getTokenFromCookies = (type: TokenType): string | null => {
-  console.log('Cookies.get(`${type}_token`) || null', Cookies.get(`${type}_token`) || null)
   return Cookies.get(`${type}_token`) || null
 }
 
