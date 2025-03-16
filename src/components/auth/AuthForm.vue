@@ -26,7 +26,7 @@ import { Card, Input, InputPassword } from 'ant-design-vue';
 import router from '@/router';
 import { notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
-import { nextTick, ref } from 'vue';
+import { ref } from 'vue';
 import http from '@/services/http';
 import { computed } from 'vue';
 import { useAuthStore } from '@/store/authStore';

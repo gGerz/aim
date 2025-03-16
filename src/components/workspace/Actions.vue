@@ -1,13 +1,26 @@
 <template>
   <div class="actions">
-    <AimButton size="big" color="cyan">Сменить черновик</AimButton>
-    <AimButton size="big" color="cyan">Сохранить черновик</AimButton>
-    <AimButton size="big" color="cyan">Очистить черновики</AimButton>
+    <AimButton size="big" color="cyan" @click="emit('change-configuration')" :disabled="configurationCounter === 0">Сменить черновик (Всего: {{configurationCounter}})</AimButton>
+    <AimButton size="big" color="cyan" @click="emit('save-configuration')">Сохранить черновик</AimButton>
+    <AimButton size="big" color="cyan" @click="emit('clear-all-configurations')" :disabled="configurationCounter !== 0">Очистить черновики</AimButton>
   </div>
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
 
+const emit = defineEmits<{
+  'change-configuration': []
+  'save-configuration': []
+  'clear-all-configurations': []
+}>()
+
+interface IProps {
+  configurationCounter: number
+}
+
+withDefaults(defineProps<IProps>(), {
+  configurationCounter: 0,
+})
 
 </script>
 <style lang="scss" scoped>

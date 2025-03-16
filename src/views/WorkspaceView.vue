@@ -3,7 +3,12 @@
     <div class="workspace-view__content">
       <div class="workspace-view__grid">
         <template v-if="currentStep === 1">
-          <Actions/>
+          <Actions
+            :configuration-counter="configurationList.length"
+            @clear-all-configurations="clearAllConfigurations"
+            @change-configuration="changeConfiguration"
+            @save-configuration="saveConfiguration"
+          />
           <div class="workspace-view__first">
             <Constructor @on-start-click="goToNextStep"/>
             <ChatWindow/>
@@ -21,8 +26,8 @@
         к  неисправности станка или поломке инструмента.
       </p>
        <template #footer>
-        <AimButton :is-full-width="false" color="cyan">Назад</AimButton>
-        <AimButton :is-full-width="false" color="orange">Принять</AimButton>
+        <AimButton :is-full-width="false" color="cyan" @click="onModalCancel">Назад</AimButton>
+        <AimButton :is-full-width="false" color="orange" @click="onModalAccept">Принять</AimButton>
        </template>
     </Modal>
   </div>
@@ -34,9 +39,12 @@ import Constructor from '@/components/workspace/Constructor.vue';
 import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 import Tools from '@/components/workspace/Tools.vue';
 import ModelViewer from '@/components/workspace/ModelViewer.vue';
-import { ref } from 'vue';
-import { Modal } from 'ant-design-vue';
+import { ref, onMounted } from 'vue';
+import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
+import http from '@/services/http';
+import type { IConfiguration } from '@/types/configurations';
+
 const currentStep = ref(1)
 
 const goToNextStep = () => {
@@ -48,15 +56,56 @@ const goToPrevStep = () => {
 }
 
 const open = ref<boolean>(false);
+const configurationList = ref<IConfiguration[]>([]);
+const currentConfigurationData = ref<IConfiguration | object>({});
+const currentConfigurationIndex = ref<number>(0)
 
 const showModal = () => {
   open.value = true;
 };
 
-const handleOk = (e: MouseEvent) => {
-  console.log(e);
+const onModalAccept = () => {
   open.value = false;
 };
+
+const onModalCancel = () => {
+  open.value = false;
+};
+
+const loadConfigurations = () => {
+  http.get<IConfiguration[]>('configurations/').then((res) => {
+    configurationList.value = res.data
+  })
+}
+
+const saveConfiguration = () => {
+  // http.get('configurations/').then((res) => {
+  //   configurationList.value = res.data
+  // })
+
+  notification.success({
+    message: 'Черновик успешно сохранен',
+  })
+}
+const changeConfiguration = () => {
+  const newIndex = currentConfigurationIndex.value + 1
+  currentConfigurationIndex.value = newIndex
+  currentConfigurationData.value = configurationList.value[newIndex]
+
+}
+const clearAllConfigurations = () => {
+  http.delete('configurations/clear_all/').then(() => {
+    configurationList.value = []
+
+    notification.success({
+      message: 'Черновики успешно очищены',
+    })
+  })
+}
+
+onMounted(() => {
+  loadConfigurations()
+})
 
 </script>
 
