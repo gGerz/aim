@@ -8,6 +8,7 @@ import vueDevTools from 'vite-plugin-vue-devtools'
 export default defineConfig({
   base: '/aim/',
   plugins: [vue(), vueDevTools()],
+  assetsInclude: ['**/*.stl'],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url)),
