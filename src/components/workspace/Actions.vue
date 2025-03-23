@@ -2,7 +2,7 @@
   <div class="actions">
     <AimButton size="big" color="cyan" @click="emit('change-configuration')" :disabled="configurationCounter === 0">Сменить черновик (Всего: {{configurationCounter}})</AimButton>
     <AimButton size="big" color="cyan" @click="emit('save-configuration')">Сохранить черновик</AimButton>
-    <AimButton size="big" color="cyan" @click="emit('clear-all-configurations')" :disabled="configurationCounter !== 0">Очистить черновики</AimButton>
+    <AimButton size="big" color="cyan" @click="emit('clear-all-configurations')" :disabled="configurationCounter === 0">Очистить черновики</AimButton>
   </div>
 </template>
 <script lang="ts" setup>

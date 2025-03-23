@@ -69,7 +69,6 @@ const onAuthClick = () => {
     })
   }).finally(() => {
     isLoading.value = false
-
   })
 }
 

@@ -31,7 +31,7 @@
         <label class="constructor__sizes">
           <span>Введите размер заготовки</span>
           <div class="constructor__size-inputs">
-            <InputNumber class="">
+            <InputNumber v-model:value="xSize">
             <template #addonBefore>
               x
             </template>
@@ -39,7 +39,7 @@
               mm
             </template>
           </InputNumber>
-          <InputNumber>
+          <InputNumber v-model:value="ySize">
             <template #addonBefore>
               y
             </template>
@@ -47,7 +47,7 @@
               mm
             </template>
           </InputNumber>
-          <InputNumber>
+          <InputNumber v-model:value="zSize">
             <template #addonBefore>
               z
             </template>
@@ -62,7 +62,7 @@
         <label class="constructor__sizes">
           <span>Введите диаметр</span>
           <div class="constructor__size-inputs">
-            <InputNumber class="">
+            <InputNumber  v-model:value="diameter">
             <template #addonBefore>
               Ø
             </template>
@@ -74,30 +74,68 @@
         </label>
       </div>
     </div>
-    <UploadDragger class="constructor__file">
-      Прикрепите STL-Модель
-    </UploadDragger>
+    <div class="constructor__file">
+      <UploadDragger :maxCount="1" v-model:file-list="stlFile">
+        Прикрепите STL-Модель
+      </UploadDragger>
+      <div class="constructor__file-item" v-if="!stlFile.length"></div>
+    </div>
     <AimButton class="constructor__button" size="big" @click="onStartClick">Старт</AimButton>
   </Card>
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup } from 'ant-design-vue';
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 
+
+type ICreatePayload = {
+  machine_type?: string,
+  control_system?: string,
+  x_size?: number,
+  y_size?: number,
+  z_size?: number,
+  diameter?: number,
+  stl_file?: string,
+}
+
 type Emits = {
-  'on-start-click': []
+  'on-start-click': [payload: ICreatePayload]
+}
+type Props = {
+  draftData: any
 }
 const emit = defineEmits<Emits>()
+const props = defineProps<Props>()
 
 
 const machineType = ref<string>('a');
 const standType = ref<string>('2');
+const xSize = ref<number>();
+const ySize = ref<number>();
+const zSize = ref<number>();
+const diameter = ref<number>();
+const stlFile = ref([]);
 
 const onStartClick = () => {
-  emit('on-start-click')
+  const payload = {
+    machine_type: machineType.value,
+    control_system: standType.value,
+    x_size: xSize.value,
+    y_size: ySize.value,
+    z_size: zSize.value,
+    diameter: diameter.value,
+    stl_file: '',
+  }
+  emit('on-start-click', payload)
 }
+
+watch(() => props.draftData, (newVal) => {
+  xSize.value = newVal.x_size
+  ySize.value = newVal.y_size
+  zSize.value = newVal.z_size
+})
 
 </script>
 <style lang="scss" scoped>
@@ -161,6 +199,14 @@ const onStartClick = () => {
       display: flex;
       align-items: center;
       justify-content: center;
+    }
+
+    ::v-deep(.ant-upload-list-item-container) {
+      transition: unset;
+    }
+
+    &-item {
+      height: 30px;
     }
   }
  }

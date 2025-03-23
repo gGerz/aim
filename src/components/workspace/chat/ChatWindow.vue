@@ -59,7 +59,7 @@ const handleSendMessage = (message: string) => {
     height: 100%;
     padding-top: 56px;
     margin-top: -56px;
-    max-height: 565px;
+    max-height: 601px;
 
     &:after {
       display: none;

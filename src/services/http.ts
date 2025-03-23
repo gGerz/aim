@@ -60,8 +60,12 @@ class ApiService {
 
               originalRequest.headers!['Authorization'] = `Bearer ${newTokens.access}`
               return this.api(originalRequest)
+            } else {
             }
           } catch (err) {
+            window.location.reload()
+            Cookies.remove('access_token')
+            Cookies.remove('refresh_token')
             console.error('Ошибка при обновлении токена:', err)
           }
         }
@@ -98,6 +102,27 @@ class ApiService {
 
   public post<T>(url: string, data: T, config: AxiosRequestConfig = {}): Promise<AxiosResponse> {
     return this.api.post<T>(url, data, config)
+  }
+
+  public postFormData<T extends { [key: string]: string | number | object }>(
+    url: string,
+    data: T,
+    config: AxiosRequestConfig = {},
+  ): Promise<AxiosResponse> {
+    const formData = new FormData()
+
+    for (const [key, value] of Object.entries(data)) {
+      if (value !== null && value !== undefined) {
+        formData.append(key, value.toString())
+      }
+    }
+
+    const headers = {
+      ...config.headers,
+      'Content-Type': 'multipart/form-data',
+    }
+
+    return this.api.post<T>(url, formData, { ...config, headers })
   }
 
   public put<T>(url: string, data: T, config: AxiosRequestConfig = {}): Promise<AxiosResponse> {

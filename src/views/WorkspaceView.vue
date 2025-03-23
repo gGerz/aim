@@ -10,7 +10,7 @@
             @save-configuration="saveConfiguration"
           />
           <div class="workspace-view__first">
-            <Constructor @on-start-click="goToNextStep"/>
+            <Constructor :draftData="currentConfigurationData"  @on-start-click="onCreateConfiguration"/>
             <ChatWindow/>
           </div>
         </template>
@@ -47,7 +47,8 @@ import type { IConfiguration } from '@/types/configurations';
 
 const currentStep = ref(1)
 
-const goToNextStep = () => {
+const goToNextStep = async () => {
+  // await createConfiguration(true)
   currentStep.value = 2
 }
 
@@ -58,7 +59,7 @@ const goToPrevStep = () => {
 const open = ref<boolean>(false);
 const configurationList = ref<IConfiguration[]>([]);
 const currentConfigurationData = ref<IConfiguration | object>({});
-const currentConfigurationIndex = ref<number>(0)
+const currentConfigurationIndex = ref<number | null>(null)
 
 const showModal = () => {
   open.value = true;
@@ -72,8 +73,39 @@ const onModalCancel = () => {
   open.value = false;
 };
 
+const loadMachines = () => {
+  http.get<IConfiguration[]>('configurations/machine_types/').then((res) => {
+    console.log('loadMachines', res )
+  })
+}
+const loadTools = () => {
+  http.get('configurations/tools?machine_type=lathe').then((res) => {
+    console.log('loadTools', res )
+  })
+}
+const loadControls = (machineType: string) => {
+  http.get<IConfiguration[]>('configurations/control_systems/', { params: { machine_type: machineType } }).then((res) => {
+    console.log('loadControls', res )
+  })
+}
+
+const createConfiguration = (isDraft) => {
+  const payload = {
+    machine_type: 'milling',
+    control_system: 'fanuc',
+    x_size: '300',
+    y_size: '450',
+    z_size: '500',
+    diameter: '',
+    is_draft: isDraft,
+    stl_file: '',
+  }
+  return http.postFormData('configurations/', payload).then((res) => {
+    console.log('res', res)
+  })
+}
 const loadConfigurations = () => {
-  http.get<IConfiguration[]>('configurations/').then((res) => {
+  http.get<IConfiguration[]>('configurations/drafts/').then((res) => {
     configurationList.value = res.data
   })
 }
@@ -88,13 +120,15 @@ const saveConfiguration = () => {
   })
 }
 const changeConfiguration = () => {
-  const newIndex = currentConfigurationIndex.value + 1
+  const tmpIndex = currentConfigurationIndex.value === null ? -1 : currentConfigurationIndex.value
+  const isNextExist = tmpIndex <= configurationList.value.length - 2
+  const newIndex = isNextExist ? tmpIndex + 1 : 0
   currentConfigurationIndex.value = newIndex
   currentConfigurationData.value = configurationList.value[newIndex]
 
 }
 const clearAllConfigurations = () => {
-  http.delete('configurations/clear_all/').then(() => {
+  http.delete('configurations/clear_drafts/').then(() => {
     configurationList.value = []
 
     notification.success({
@@ -103,8 +137,17 @@ const clearAllConfigurations = () => {
   })
 }
 
+const onCreateConfiguration = async () => {
+  createConfiguration(false).then(() => {
+    goToNextStep()
+  })
+}
+
 onMounted(() => {
   loadConfigurations()
+  loadMachines()
+  loadTools()
+  loadControls('milling')
 })
 
 </script>
