@@ -24,10 +24,18 @@
         </div>
       </div>
       <div class="constructor__row">
+        <div class="constructor__label">
+          <span>Размеры по диаметру</span>
+          <div>
+            <Switch v-model:checked="isDiameterEnabled"/>
+          </div>
+        </div>
+      </div>
+      <div class="constructor__row">
         <label class="constructor__sizes">
           <span>Введите размер заготовки</span>
           <div class="constructor__size-inputs">
-            <InputNumber v-model:value="xSize">
+            <InputNumber v-model:value="xSize" :disabled="isDiameterEnabled">
             <template #addonBefore>
               x
             </template>
@@ -35,7 +43,7 @@
               mm
             </template>
           </InputNumber>
-          <InputNumber v-model:value="ySize">
+          <InputNumber v-model:value="ySize" :disabled="isDiameterEnabled">
             <template #addonBefore>
               y
             </template>
@@ -58,7 +66,7 @@
         <label class="constructor__sizes">
           <span>Введите диаметр</span>
           <div class="constructor__size-inputs">
-            <InputNumber  v-model:value="diameter">
+            <InputNumber  v-model:value="diameter" :disabled="!isDiameterEnabled">
             <template #addonBefore>
               Ø
             </template>
@@ -71,21 +79,21 @@
       </div>
     </div>
     <div class="constructor__file">
-      <UploadDragger :maxCount="1" v-model:file-list="stlFiles" accept=".stl" :customRequest="uploadSTL">
-        Прикрепите STL-Модель
+      <UploadDragger :maxCount="1" :showUploadList="false" accept=".stl" :customRequest="uploadSTL">
+        {{fileUploadText}}
       </UploadDragger>
-      <div class="constructor__file-item" v-if="!stlFiles.length"></div>
     </div>
     <AimButton class="constructor__button" size="big" @click="onStartClick">Старт</AimButton>
   </Card>
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
-import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification } from 'ant-design-vue';
-import { ref, watch } from 'vue';
+import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
+import { computed, ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
+import { fileList } from '@primeuix/themes/aura/fileupload';
 
 export type ICreatePayload = {
   machine_type?: IConfiguration,
@@ -114,8 +122,10 @@ const xSize = ref<number>();
 const ySize = ref<number>();
 const zSize = ref<number>();
 const diameter = ref<number>();
-const stlFiles = ref([]);
 const uploadedStlFileUrl = ref('');
+const isUploadErrorExist = ref(false);
+const isFileUploaded = ref(false);
+const isDiameterEnabled = ref(false);
 
 const onStartClick = () => {
   const payload = {
@@ -131,20 +141,48 @@ const onStartClick = () => {
 }
 
 const uploadSTL = (options) => {
-  const { file, onSuccess, onError } = options; // Деструктурируем file
+  const { file, onSuccess, onError } = options;
+  isFileUploaded.value = true
+  isUploadErrorExist.value = false
 
   http.postFormData('upload-stl/', { file }).then((res) => {
-    console.log('res', res.data.file_url)
     uploadedStlFileUrl.value = res.data.file_url
     onSuccess()
-  }).catch((err) => {
+  }).catch(() => {
     onError()
+    isUploadErrorExist.value = true
     notification.error({
       message: 'При загрузке файла произошла ошибка',
     })
-    console.log('err', err)
+  }).finally(() => {
+    isFileUploaded.value = false
   })
 }
+
+const getStlFilename = (path: string): string | null => {
+    const match = path.match(/\/([^\/]+\.stl)$/i);
+    if (!match) return null;
+
+    let filename = match[1];
+
+    if (filename.length > 20) {
+        filename = filename.slice(0, 2) + "..." + filename.slice(-15);
+    }
+
+    return filename;
+}
+
+const fileUploadText = computed(() => {
+  if (isFileUploaded.value) {
+    return 'Идет загрузка...'
+  } else if (isUploadErrorExist.value) {
+    return 'Произошла ошибка при загрузке файла'
+  } else if (uploadedStlFileUrl.value) {
+     return `STL-Модель "${getStlFilename(uploadedStlFileUrl.value)}" успешно добавлена!`
+  } else {
+    return 'Прикрепите STL-Модель'
+  }
+})
 
 watch(() => props.configuration, (newVal) => {
   machineType.value = newVal?.[0]
@@ -170,6 +208,24 @@ watch(() => props.draft, (newVal) => {
   ySize.value = newVal?.y_size
   zSize.value = newVal?.z_size
   diameter.value = newVal?.diameter
+
+  uploadedStlFileUrl.value = newVal!.stl_file
+
+  if (newVal?.diameter) {
+    xSize.value = undefined
+    ySize.value = undefined
+  } else {
+    diameter.value = undefined
+  }
+})
+
+watch(isDiameterEnabled, (newVal) => {
+  if (newVal) {
+    xSize.value = undefined
+    ySize.value = undefined
+  } else {
+    diameter.value = undefined
+  }
 })
 
 defineExpose({
