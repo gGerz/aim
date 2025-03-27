@@ -11,8 +11,7 @@
         <div class="constructor__label">
           <span>Выберите тип станка</span>
           <RadioGroup v-model:value="machineType">
-            <RadioButton value="a">Фрезерный</RadioButton>
-            <RadioButton value="b">Токарный</RadioButton>
+            <RadioButton v-for="machine in configuration" :key="machine.id" :value="machine">{{machine.name}}</RadioButton>
           </RadioGroup>
         </div>
       </div>
@@ -20,10 +19,7 @@
         <div  class="constructor__label">
           <span>Выберите тип стойки</span>
           <RadioGroup v-model:value="standType">
-            <RadioButton value="1">Стойка 1</RadioButton>
-            <RadioButton value="2">Стойка 2</RadioButton>
-            <RadioButton value="3">Стойка 3</RadioButton>
-            <RadioButton value="4">Стойка 4</RadioButton>
+            <RadioButton v-for="control in machineType?.controls" :key="control.id" :value="control">{{control.name}}</RadioButton>
           </RadioGroup>
         </div>
       </div>
@@ -88,11 +84,12 @@ import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup } from 'ant-design-vue';
 import { ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
+import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 
 
-type ICreatePayload = {
-  machine_type?: string,
-  control_system?: string,
+export type ICreatePayload = {
+  machine_type?: IConfiguration,
+  control_system?: IControl,
   x_size?: number,
   y_size?: number,
   z_size?: number,
@@ -104,14 +101,15 @@ type Emits = {
   'on-start-click': [payload: ICreatePayload]
 }
 type Props = {
-  draftData: any
+  draft?: IDraft
+  configuration?: IConfiguration[]
 }
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
 
 
-const machineType = ref<string>('a');
-const standType = ref<string>('2');
+const machineType = ref<IConfiguration>();
+const standType = ref<IControl>();
 const xSize = ref<number>();
 const ySize = ref<number>();
 const zSize = ref<number>();
@@ -131,10 +129,40 @@ const onStartClick = () => {
   emit('on-start-click', payload)
 }
 
-watch(() => props.draftData, (newVal) => {
-  xSize.value = newVal.x_size
-  ySize.value = newVal.y_size
-  zSize.value = newVal.z_size
+watch(() => props.configuration, (newVal) => {
+  machineType.value = newVal?.[0]
+  standType.value = newVal?.[0].controls?.[0]
+})
+
+watch(machineType, (newVal) => {
+  const findStand = newVal?.controls.find((control) => control.type === standType.value?.type)
+  if (!!findStand) {
+    standType.value = findStand
+  } else {
+    standType.value = newVal?.controls?.[0]
+  }
+})
+
+watch(() => props.draft, (newVal) => {
+  machineType.value = props.configuration?.find((conf) => conf.type === newVal?.machine_type)
+
+  const standIndex = props.configuration?.findIndex((conf) => conf.type === newVal?.machine_type) || 0
+  standType.value = props.configuration?.[standIndex].controls.find((control) => control.type === newVal?.control_system)
+
+  xSize.value = newVal?.x_size
+  ySize.value = newVal?.y_size
+  zSize.value = newVal?.z_size
+  diameter.value = newVal?.diameter
+})
+
+defineExpose({
+  machine_type: machineType,
+  control_system: standType,
+  x_size: xSize,
+  y_size: ySize,
+  z_size: zSize,
+  diameter: diameter,
+  stl_file: stlFile,
 })
 
 </script>

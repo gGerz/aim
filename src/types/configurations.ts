@@ -1,4 +1,4 @@
-export interface IConfiguration {
+export interface IDraft {
   id: number
   stl_file: string
   is_saved: false
@@ -10,4 +10,18 @@ export interface IConfiguration {
   stl_processed_data: null
   created_at: string
   user: number
+  diameter: number
+}
+
+export interface IControl {
+  id: number
+  type: string
+  name: string
+}
+
+export interface IConfiguration {
+  id: number
+  type: string
+  name: string
+  controls: IControl[]
 }

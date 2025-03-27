@@ -35,7 +35,7 @@ const authStore = useAuthStore();
 
 const isLoading = ref(false)
 const authForm = ref({
-  userName: 'german',
+  userName: 'german1',
   password: '123456qW!'
 })
 

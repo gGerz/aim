@@ -4,13 +4,18 @@
       <div class="workspace-view__grid">
         <template v-if="currentStep === 1">
           <Actions
-            :configuration-counter="configurationList.length"
+            :configuration-counter="draftList.length"
             @clear-all-configurations="clearAllConfigurations"
-            @change-configuration="changeConfiguration"
+            @change-configuration="changeDraft"
             @save-configuration="saveConfiguration"
           />
           <div class="workspace-view__first">
-            <Constructor :draftData="currentConfigurationData"  @on-start-click="onCreateConfiguration"/>
+            <Constructor
+              ref="constructorRef"
+              :draft="currentDraftData"
+              :configuration="configurationData"
+              @on-start-click="console.log('start')"
+            />
             <ChatWindow/>
           </div>
         </template>
@@ -35,7 +40,7 @@
 
 <script lang="ts" setup>
 import Actions from '@/components/workspace/Actions.vue';
-import Constructor from '@/components/workspace/Constructor.vue';
+import Constructor, { type ICreatePayload } from '@/components/workspace/Constructor.vue';
 import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 import Tools from '@/components/workspace/Tools.vue';
 import ModelViewer from '@/components/workspace/ModelViewer.vue';
@@ -43,7 +48,7 @@ import { ref, onMounted } from 'vue';
 import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
-import type { IConfiguration } from '@/types/configurations';
+import type { IConfiguration, IDraft } from '@/types/configurations';
 
 const currentStep = ref(1)
 
@@ -57,9 +62,13 @@ const goToPrevStep = () => {
 }
 
 const open = ref<boolean>(false);
-const configurationList = ref<IConfiguration[]>([]);
-const currentConfigurationData = ref<IConfiguration | object>({});
-const currentConfigurationIndex = ref<number | null>(null)
+const draftList = ref<IDraft[]>([]);
+const currentDraftData = ref<IDraft>();
+const currentDraftIndex = ref<number | null>(null)
+
+const constructorRef = ref(null)
+
+const configurationData = ref<IConfiguration[]>()
 
 const showModal = () => {
   open.value = true;
@@ -73,63 +82,66 @@ const onModalCancel = () => {
   open.value = false;
 };
 
-const loadMachines = () => {
-  http.get<IConfiguration[]>('configurations/machine_types/').then((res) => {
-    console.log('loadMachines', res )
-  })
-}
-const loadTools = () => {
-  http.get('configurations/tools?machine_type=lathe').then((res) => {
-    console.log('loadTools', res )
+const loadConfigurations = () => {
+  http.get<IConfiguration[]>('configurations/types-with-controls/').then((res) => {
+    console.log('loadConfigurations', res )
+    configurationData.value = res.data
   })
 }
 const loadControls = (machineType: string) => {
-  http.get<IConfiguration[]>('configurations/control_systems/', { params: { machine_type: machineType } }).then((res) => {
+  http.get<IDraft[]>('configurations/control_systems/', { params: { machine_type: machineType } }).then((res) => {
     console.log('loadControls', res )
   })
 }
 
-const createConfiguration = (isDraft) => {
+const createConfiguration = async (isDraft: boolean) => {
+  const config = constructorRef.value as unknown as ICreatePayload
   const payload = {
-    machine_type: 'milling',
-    control_system: 'fanuc',
-    x_size: '300',
-    y_size: '450',
-    z_size: '500',
-    diameter: '',
+    machine_type: config?.machine_type?.type,
+    control_system: config?.control_system?.type,
+    x_size: config?.x_size,
+    y_size: config?.y_size,
+    z_size: config?.z_size,
+    diameter: config?.diameter,
     is_draft: isDraft,
-    stl_file: '',
+    stl_file: config?.stl_file,
   }
-  return http.postFormData('configurations/', payload).then((res) => {
-    console.log('res', res)
-  })
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  return http.postFormData<any>('configurations/', payload)
 }
-const loadConfigurations = () => {
-  http.get<IConfiguration[]>('configurations/drafts/').then((res) => {
-    configurationList.value = res.data
+const loadDrafts = () => {
+  http.get<IDraft[]>('configurations/drafts/').then((res) => {
+    draftList.value = res.data
   })
 }
 
-const saveConfiguration = () => {
-  // http.get('configurations/').then((res) => {
-  //   configurationList.value = res.data
-  // })
-
-  notification.success({
-    message: 'Черновик успешно сохранен',
+const saveConfiguration = async () => {
+  createConfiguration(true).then((res) => {
+    draftList.value.push(res.data)
+    notification.success({
+      message: 'Черновик успешно сохранен',
+    })
+  }).catch((err) => {
+    const errObj = err.response.data
+    Object.keys(errObj).forEach(key => {
+      notification.error({
+        message: `${key}: ${errObj[key]}`,
+      })
+    });
   })
+
 }
-const changeConfiguration = () => {
-  const tmpIndex = currentConfigurationIndex.value === null ? -1 : currentConfigurationIndex.value
-  const isNextExist = tmpIndex <= configurationList.value.length - 2
+const changeDraft = () => {
+  const tmpIndex = currentDraftIndex.value === null ? -1 : currentDraftIndex.value
+  const isNextExist = tmpIndex <= draftList.value.length - 2
   const newIndex = isNextExist ? tmpIndex + 1 : 0
-  currentConfigurationIndex.value = newIndex
-  currentConfigurationData.value = configurationList.value[newIndex]
+  currentDraftIndex.value = newIndex
+  currentDraftData.value = draftList.value[newIndex]
 
 }
 const clearAllConfigurations = () => {
   http.delete('configurations/clear_drafts/').then(() => {
-    configurationList.value = []
+    draftList.value = []
 
     notification.success({
       message: 'Черновики успешно очищены',
@@ -145,8 +157,7 @@ const onCreateConfiguration = async () => {
 
 onMounted(() => {
   loadConfigurations()
-  loadMachines()
-  loadTools()
+  loadDrafts()
   loadControls('milling')
 })
 
