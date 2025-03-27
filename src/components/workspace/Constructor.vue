@@ -71,21 +71,21 @@
       </div>
     </div>
     <div class="constructor__file">
-      <UploadDragger :maxCount="1" v-model:file-list="stlFile">
+      <UploadDragger :maxCount="1" v-model:file-list="stlFiles" accept=".stl" :customRequest="uploadSTL">
         Прикрепите STL-Модель
       </UploadDragger>
-      <div class="constructor__file-item" v-if="!stlFile.length"></div>
+      <div class="constructor__file-item" v-if="!stlFiles.length"></div>
     </div>
     <AimButton class="constructor__button" size="big" @click="onStartClick">Старт</AimButton>
   </Card>
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
-import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup } from 'ant-design-vue';
+import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification } from 'ant-design-vue';
 import { ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
-
+import http from '@/services/http';
 
 export type ICreatePayload = {
   machine_type?: IConfiguration,
@@ -114,7 +114,8 @@ const xSize = ref<number>();
 const ySize = ref<number>();
 const zSize = ref<number>();
 const diameter = ref<number>();
-const stlFile = ref([]);
+const stlFiles = ref([]);
+const uploadedStlFileUrl = ref('');
 
 const onStartClick = () => {
   const payload = {
@@ -127,6 +128,22 @@ const onStartClick = () => {
     stl_file: '',
   }
   emit('on-start-click', payload)
+}
+
+const uploadSTL = (options) => {
+  const { file, onSuccess, onError } = options; // Деструктурируем file
+
+  http.postFormData('upload-stl/', { file }).then((res) => {
+    console.log('res', res.data.file_url)
+    uploadedStlFileUrl.value = res.data.file_url
+    onSuccess()
+  }).catch((err) => {
+    onError()
+    notification.error({
+      message: 'При загрузке файла произошла ошибка',
+    })
+    console.log('err', err)
+  })
 }
 
 watch(() => props.configuration, (newVal) => {
@@ -162,7 +179,7 @@ defineExpose({
   y_size: ySize,
   z_size: zSize,
   diameter: diameter,
-  stl_file: stlFile,
+  stl_file: uploadedStlFileUrl,
 })
 
 </script>

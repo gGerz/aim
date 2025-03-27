@@ -83,7 +83,7 @@ class ApiService {
       }
 
       const response: AxiosResponse<Tokens> = await axios.post(
-        `${import.meta.env.VITE_API_URL}/refresh-token`,
+        `${import.meta.env.VITE_API_URL}refresh-token`,
         {
           refresh: refreshToken,
         },
@@ -113,7 +113,7 @@ class ApiService {
 
     for (const [key, value] of Object.entries(data)) {
       if (value !== null && value !== undefined) {
-        formData.append(key, value.toString())
+        formData.append(key, value as string | Blob)
       }
     }
 
@@ -121,6 +121,8 @@ class ApiService {
       ...config.headers,
       'Content-Type': 'multipart/form-data',
     }
+
+    console.log('formdata', formData)
 
     return this.api.post<T>(url, formData, { ...config, headers })
   }
