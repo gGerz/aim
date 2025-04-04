@@ -8,7 +8,7 @@
           :backgroundAlpha="0.5"
           :rotation="rotation"
           @load="onLoad"
-          :src="stlFile"
+          :src="stlUrl || stlFile"
         />
         Предварительный расчет времени: <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
     </div>
@@ -19,6 +19,11 @@ import stlFile from '@/assets/uzor.stl'
 import { ModelStl } from 'vue-3d-model';
 import { Card } from 'ant-design-vue';
 import { reactive } from 'vue'
+
+type Props = {
+  stlUrl: string
+}
+defineProps<Props>()
 
 
 const rotation = reactive({

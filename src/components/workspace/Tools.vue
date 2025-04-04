@@ -6,13 +6,13 @@
         Рекомендуемые инструменты
       </div>
     </template>
-    <List class="tools__list" :data-source="toolsList">
+    <List class="tools__list" :data-source="tools">
       <template #renderItem="{ item }">
         <ListItem>
           <template #actions>
             <div class="tools__badge">T8</div>
           </template>
-          {{ item }}
+          <b>{{ item.name }}</b>
         </ListItem>
       </template>
     </List>
@@ -25,14 +25,18 @@
   </Card>
 </template>
 <script lang="ts" setup>
+import type { ITool } from '@/types/configurations';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, List, ListItem } from 'ant-design-vue';
 import { ref } from 'vue';
-
+type Props = {
+  tools: ITool[]
+}
 type Emits = {
   'on-start-click': []
   'on-back-click': []
 }
+const props = defineProps<Props>()
 const emit = defineEmits<Emits>()
 
 const toolsList = ref([

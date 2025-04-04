@@ -2,8 +2,8 @@ export interface IDraft {
   id: number
   stl_file: string
   is_saved: false
-  machine_type: string
-  control_system: string
+  machine_type: number
+  control_system: number
   x_size: number
   y_size: number
   z_size: number
@@ -14,6 +14,11 @@ export interface IDraft {
 }
 
 export interface IControl {
+  id: number
+  type: string
+  name: string
+}
+export interface ITool {
   id: number
   type: string
   name: string

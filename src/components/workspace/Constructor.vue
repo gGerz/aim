@@ -83,17 +83,16 @@
         {{fileUploadText}}
       </UploadDragger>
     </div>
-    <AimButton class="constructor__button" size="big" @click="onStartClick">Старт</AimButton>
+    <AimButton class="constructor__button" size="big" @click="onStartClick" :disabled="isDisabled">Старт</AimButton>
   </Card>
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
-import { computed, ref, watch } from 'vue';
+import { computed, onMounted, ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
-import { fileList } from '@primeuix/themes/aura/fileupload';
 
 export type ICreatePayload = {
   machine_type?: IConfiguration,
@@ -199,10 +198,13 @@ watch(machineType, (newVal) => {
 })
 
 watch(() => props.draft, (newVal) => {
-  machineType.value = props.configuration?.find((conf) => conf.type === newVal?.machine_type)
+  machineType.value = props.configuration?.find((conf) => conf.id === newVal?.machine_type)
 
-  const standIndex = props.configuration?.findIndex((conf) => conf.type === newVal?.machine_type) || 0
-  standType.value = props.configuration?.[standIndex].controls.find((control) => control.type === newVal?.control_system)
+  const standIndex = props.configuration?.findIndex((conf) => conf.id === newVal?.machine_type) || 0
+
+  standType.value = props.configuration?.[standIndex].controls.find((control) => control.id === newVal?.control_system)
+
+  isDiameterEnabled.value = !!newVal?.diameter
 
   xSize.value = newVal?.x_size
   ySize.value = newVal?.y_size
@@ -226,6 +228,18 @@ watch(isDiameterEnabled, (newVal) => {
   } else {
     diameter.value = undefined
   }
+})
+
+const isDisabled = computed(() =>  {
+  if (isDiameterEnabled.value) {
+    return !diameter.value || !zSize.value || !uploadedStlFileUrl.value
+  } else {
+    return !xSize.value || !ySize.value || !zSize.value || !uploadedStlFileUrl.value
+  }
+})
+
+onMounted(() => {
+  console.log('props', props)
 })
 
 defineExpose({
@@ -290,6 +304,10 @@ defineExpose({
 
     ::v-deep(.ant-input-number-group-addon) {
       background-color: var(--color-orange);
+    }
+
+    ::v-deep(.ant-input-number-disabled) {
+      background-color: var(--color-grey);
     }
   }
 

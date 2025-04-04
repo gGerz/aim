@@ -14,14 +14,14 @@
               ref="constructorRef"
               :draft="currentDraftData"
               :configuration="configurationData"
-              @on-start-click="console.log('start')"
+              @on-start-click="onCreateConfiguration"
             />
             <ChatWindow/>
           </div>
         </template>
         <div class="workspace-view__second" v-if="currentStep === 2">
-          <Tools  @on-back-click="goToPrevStep"  @on-start-click="showModal"/>
-          <ModelViewer/>
+          <Tools :tools="tools"  @on-back-click="goToPrevStep" @on-start-click="showModal"/>
+          <ModelViewer :stl-url="stlUrl"/>
         </div>
       </div>
     </div>
@@ -44,13 +44,14 @@ import Constructor, { type ICreatePayload } from '@/components/workspace/Constru
 import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 import Tools from '@/components/workspace/Tools.vue';
 import ModelViewer from '@/components/workspace/ModelViewer.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
-import type { IConfiguration, IDraft } from '@/types/configurations';
+import type { IConfiguration, IDraft, ITool } from '@/types/configurations';
 
 const currentStep = ref(1)
+const tools = ref<ITool[]>([])
 
 const goToNextStep = async () => {
   // await createConfiguration(true)
@@ -88,17 +89,22 @@ const loadConfigurations = () => {
     configurationData.value = res.data
   })
 }
-const loadControls = (machineType: string) => {
-  http.get<IDraft[]>('configurations/control_systems/', { params: { machine_type: machineType } }).then((res) => {
-    console.log('loadControls', res )
+const loadTools = (machineTypeId: number) => {
+  http.get<ITool[]>('configurations/tools/', { params: { machine_type_id: machineTypeId } }).then((res) => {
+    tools.value = res.data
   })
 }
+
+const stlUrl = computed(() => {
+  const config = constructorRef.value as unknown as ICreatePayload
+  return config?.stl_file || ''
+})
 
 const createConfiguration = async (isDraft: boolean) => {
   const config = constructorRef.value as unknown as ICreatePayload
   const payload = {
-    machine_type: config?.machine_type?.type,
-    control_system: config?.control_system?.type,
+    machine_type: config?.machine_type?.id,
+    control_system: config?.control_system?.id,
     x_size: config?.x_size,
     y_size: config?.y_size,
     z_size: config?.z_size,
@@ -149,16 +155,19 @@ const clearAllConfigurations = () => {
   })
 }
 
-const onCreateConfiguration = async () => {
+const onCreateConfiguration = () => {
   createConfiguration(false).then(() => {
-    goToNextStep()
+  const config = constructorRef.value as unknown as ICreatePayload
+  if (config.machine_type) {
+      loadTools(config.machine_type.id)
+      goToNextStep()
+    }
   })
 }
 
 onMounted(() => {
   loadConfigurations()
   loadDrafts()
-  loadControls('milling')
 })
 
 </script>
