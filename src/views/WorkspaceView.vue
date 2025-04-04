@@ -21,7 +21,7 @@
         </template>
         <div class="workspace-view__second" v-if="currentStep === 2">
           <Tools :tools="tools"  @on-back-click="goToPrevStep" @on-start-click="showModal"/>
-          <ModelViewer :stl-url="stlUrl"/>
+          <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
         </div>
       </div>
     </div>
@@ -49,12 +49,13 @@ import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
 import type { IConfiguration, IDraft, ITool } from '@/types/configurations';
+import { useConstructorStore } from '@/stores/constructor';
 
+const constructorStore = useConstructorStore()
 const currentStep = ref(1)
 const tools = ref<ITool[]>([])
 
 const goToNextStep = async () => {
-  // await createConfiguration(true)
   currentStep.value = 2
 }
 
@@ -95,22 +96,16 @@ const loadTools = (machineTypeId: number) => {
   })
 }
 
-const stlUrl = computed(() => {
-  const config = constructorRef.value as unknown as ICreatePayload
-  return config?.stl_file || ''
-})
-
 const createConfiguration = async (isDraft: boolean) => {
-  const config = constructorRef.value as unknown as ICreatePayload
   const payload = {
-    machine_type: config?.machine_type?.id,
-    control_system: config?.control_system?.id,
-    x_size: config?.x_size,
-    y_size: config?.y_size,
-    z_size: config?.z_size,
-    diameter: config?.diameter,
-    is_draft: isDraft,
-    stl_file: config?.stl_file,
+    machine_type: constructorStore.machineType!.id,
+    control_system: constructorStore.standType!.id,
+    x_size: constructorStore.xSize,
+    y_size: constructorStore.ySize,
+    z_size: constructorStore.zSize,
+    diameter: constructorStore.diameter,
+    stl_file: constructorStore.uploadedStlFileUrl,
+    is_draft: isDraft
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return http.postFormData<any>('configurations/', payload)
@@ -157,11 +152,8 @@ const clearAllConfigurations = () => {
 
 const onCreateConfiguration = () => {
   createConfiguration(false).then(() => {
-  const config = constructorRef.value as unknown as ICreatePayload
-  if (config.machine_type) {
-      loadTools(config.machine_type.id)
-      goToNextStep()
-    }
+    loadTools(constructorStore.machineType!.id)
+    goToNextStep()
   })
 }
 

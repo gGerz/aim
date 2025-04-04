@@ -10,7 +10,7 @@
       <div class="constructor__row">
         <div class="constructor__label">
           <span>Выберите тип станка</span>
-          <RadioGroup v-model:value="machineType">
+          <RadioGroup v-model:value="constructorStore.machineType">
             <RadioButton v-for="machine in configuration" :key="machine.id" :value="machine">{{machine.name}}</RadioButton>
           </RadioGroup>
         </div>
@@ -18,8 +18,8 @@
       <div class="constructor__row">
         <div  class="constructor__label">
           <span>Выберите тип стойки</span>
-          <RadioGroup v-model:value="standType">
-            <RadioButton v-for="control in machineType?.controls" :key="control.id" :value="control">{{control.name}}</RadioButton>
+          <RadioGroup v-model:value="constructorStore.standType">
+            <RadioButton v-for="control in constructorStore.machineType?.controls" :key="control.id" :value="control">{{control.name}}</RadioButton>
           </RadioGroup>
         </div>
       </div>
@@ -27,7 +27,7 @@
         <div class="constructor__label">
           <span>Размеры по диаметру</span>
           <div>
-            <Switch v-model:checked="isDiameterEnabled"/>
+            <Switch v-model:checked="constructorStore.isDiameterEnabled"/>
           </div>
         </div>
       </div>
@@ -35,7 +35,7 @@
         <label class="constructor__sizes">
           <span>Введите размер заготовки</span>
           <div class="constructor__size-inputs">
-            <InputNumber v-model:value="xSize" :disabled="isDiameterEnabled">
+            <InputNumber v-model:value="constructorStore.xSize" :disabled="constructorStore.isDiameterEnabled">
             <template #addonBefore>
               x
             </template>
@@ -43,7 +43,7 @@
               mm
             </template>
           </InputNumber>
-          <InputNumber v-model:value="ySize" :disabled="isDiameterEnabled">
+          <InputNumber v-model:value="constructorStore.ySize" :disabled="constructorStore.isDiameterEnabled">
             <template #addonBefore>
               y
             </template>
@@ -51,7 +51,7 @@
               mm
             </template>
           </InputNumber>
-          <InputNumber v-model:value="zSize">
+          <InputNumber v-model:value="constructorStore.zSize">
             <template #addonBefore>
               z
             </template>
@@ -66,7 +66,7 @@
         <label class="constructor__sizes">
           <span>Введите диаметр</span>
           <div class="constructor__size-inputs">
-            <InputNumber  v-model:value="diameter" :disabled="!isDiameterEnabled">
+            <InputNumber  v-model:value="constructorStore.diameter" :disabled="!constructorStore.isDiameterEnabled">
             <template #addonBefore>
               Ø
             </template>
@@ -89,10 +89,11 @@
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
-import { computed, onMounted, ref, watch } from 'vue';
+import { computed, onMounted, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
+import { useConstructorStore } from '@/stores/constructor';
 
 export type ICreatePayload = {
   machine_type?: IConfiguration,
@@ -114,26 +115,16 @@ type Props = {
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
 
-
-const machineType = ref<IConfiguration>();
-const standType = ref<IControl>();
-const xSize = ref<number>();
-const ySize = ref<number>();
-const zSize = ref<number>();
-const diameter = ref<number>();
-const uploadedStlFileUrl = ref('');
-const isUploadErrorExist = ref(false);
-const isFileUploaded = ref(false);
-const isDiameterEnabled = ref(false);
+const constructorStore = useConstructorStore()
 
 const onStartClick = () => {
   const payload = {
-    machine_type: machineType.value,
-    control_system: standType.value,
-    x_size: xSize.value,
-    y_size: ySize.value,
-    z_size: zSize.value,
-    diameter: diameter.value,
+    machine_type: constructorStore.machineType,
+    control_system: constructorStore.standType,
+    x_size: constructorStore.xSize,
+    y_size: constructorStore.ySize,
+    z_size: constructorStore.zSize,
+    diameter: constructorStore.diameter,
     stl_file: '',
   }
   emit('on-start-click', payload)
@@ -141,20 +132,20 @@ const onStartClick = () => {
 
 const uploadSTL = (options) => {
   const { file, onSuccess, onError } = options;
-  isFileUploaded.value = true
-  isUploadErrorExist.value = false
+  constructorStore.isFileUploaded = true
+  constructorStore.isUploadErrorExist = false
 
   http.postFormData('upload-stl/', { file }).then((res) => {
-    uploadedStlFileUrl.value = res.data.file_url
+    constructorStore.uploadedStlFileUrl = res.data.file_url
     onSuccess()
   }).catch(() => {
     onError()
-    isUploadErrorExist.value = true
+    constructorStore.isUploadErrorExist = true
     notification.error({
       message: 'При загрузке файла произошла ошибка',
     })
   }).finally(() => {
-    isFileUploaded.value = false
+    constructorStore.isFileUploaded = false
   })
 }
 
@@ -172,84 +163,70 @@ const getStlFilename = (path: string): string | null => {
 }
 
 const fileUploadText = computed(() => {
-  if (isFileUploaded.value) {
+  if (constructorStore.isFileUploaded) {
     return 'Идет загрузка...'
-  } else if (isUploadErrorExist.value) {
+  } else if (constructorStore.isUploadErrorExist) {
     return 'Произошла ошибка при загрузке файла'
-  } else if (uploadedStlFileUrl.value) {
-     return `STL-Модель "${getStlFilename(uploadedStlFileUrl.value)}" успешно добавлена!`
+  } else if (constructorStore.uploadedStlFileUrl) {
+     return `STL-Модель "${getStlFilename(constructorStore.uploadedStlFileUrl)}" успешно добавлена!`
   } else {
     return 'Прикрепите STL-Модель'
   }
 })
 
 watch(() => props.configuration, (newVal) => {
-  machineType.value = newVal?.[0]
-  standType.value = newVal?.[0].controls?.[0]
+  constructorStore.machineType = newVal?.[0]
+  constructorStore.standType = newVal?.[0].controls?.[0]
 })
 
-watch(machineType, (newVal) => {
-  const findStand = newVal?.controls.find((control) => control.type === standType.value?.type)
+watch(() => constructorStore.machineType, (newVal) => {
+  const findStand = newVal?.controls.find((control) => control.type === constructorStore.standType?.type)
   if (!!findStand) {
-    standType.value = findStand
+    constructorStore.standType = findStand
   } else {
-    standType.value = newVal?.controls?.[0]
+    constructorStore.standType = newVal?.controls?.[0]
   }
 })
 
 watch(() => props.draft, (newVal) => {
-  machineType.value = props.configuration?.find((conf) => conf.id === newVal?.machine_type)
+  constructorStore.machineType = props.configuration?.find((conf) => conf.id === newVal?.machine_type)
 
   const standIndex = props.configuration?.findIndex((conf) => conf.id === newVal?.machine_type) || 0
 
-  standType.value = props.configuration?.[standIndex].controls.find((control) => control.id === newVal?.control_system)
+  constructorStore.standType = props.configuration?.[standIndex].controls.find((control) => control.id === newVal?.control_system)
 
-  isDiameterEnabled.value = !!newVal?.diameter
+  constructorStore.isDiameterEnabled = !!newVal?.diameter
 
-  xSize.value = newVal?.x_size
-  ySize.value = newVal?.y_size
-  zSize.value = newVal?.z_size
-  diameter.value = newVal?.diameter
+  constructorStore.xSize = newVal?.x_size
+  constructorStore.ySize = newVal?.y_size
+  constructorStore.zSize = newVal?.z_size
+  constructorStore.diameter = newVal?.diameter
 
-  uploadedStlFileUrl.value = newVal!.stl_file
+  constructorStore.uploadedStlFileUrl = newVal!.stl_file
 
   if (newVal?.diameter) {
-    xSize.value = undefined
-    ySize.value = undefined
+    constructorStore.xSize = undefined
+    constructorStore.ySize = undefined
   } else {
-    diameter.value = undefined
+    constructorStore.diameter = undefined
   }
 })
 
-watch(isDiameterEnabled, (newVal) => {
+watch(() => constructorStore.isDiameterEnabled, (newVal) => {
   if (newVal) {
-    xSize.value = undefined
-    ySize.value = undefined
+    constructorStore.xSize = undefined
+    constructorStore.ySize = undefined
   } else {
-    diameter.value = undefined
+    constructorStore.diameter = undefined
   }
 })
 
 const isDisabled = computed(() =>  {
-  if (isDiameterEnabled.value) {
-    return !diameter.value || !zSize.value || !uploadedStlFileUrl.value
+  if (constructorStore.isDiameterEnabled) {
+    return !constructorStore.diameter || !constructorStore.zSize || !constructorStore.uploadedStlFileUrl
   } else {
-    return !xSize.value || !ySize.value || !zSize.value || !uploadedStlFileUrl.value
+    return !constructorStore.xSize || !constructorStore.ySize || !constructorStore.zSize || !constructorStore.uploadedStlFileUrl
   }
-})
-
-onMounted(() => {
-  console.log('props', props)
-})
-
-defineExpose({
-  machine_type: machineType,
-  control_system: standType,
-  x_size: xSize,
-  y_size: ySize,
-  z_size: zSize,
-  diameter: diameter,
-  stl_file: uploadedStlFileUrl,
 })
 
 </script>
