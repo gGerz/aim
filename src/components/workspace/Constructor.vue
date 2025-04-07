@@ -102,7 +102,7 @@ export type ICreatePayload = {
   y_size?: number,
   z_size?: number,
   diameter?: number,
-  stl_file?: string,
+  stl_file_url?: string,
 }
 
 type Emits = {
@@ -125,7 +125,7 @@ const onStartClick = () => {
     y_size: constructorStore.ySize,
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
-    stl_file: '',
+    stl_file_url: constructorStore.uploadedStlFileUrl,
   }
   emit('on-start-click', payload)
 }
@@ -134,9 +134,10 @@ const uploadSTL = (options) => {
   const { file, onSuccess, onError } = options;
   constructorStore.isFileUploaded = true
   constructorStore.isUploadErrorExist = false
+  constructorStore.uploadedStlFileUrl = ''
 
   http.postFormData('upload-stl/', { file }).then((res) => {
-    constructorStore.uploadedStlFileUrl = res.data.file_url
+    constructorStore.uploadedStlFileUrl = res.data.stl_file_url
     onSuccess()
   }).catch(() => {
     onError()
@@ -202,7 +203,7 @@ watch(() => props.draft, (newVal) => {
   constructorStore.zSize = newVal?.z_size
   constructorStore.diameter = newVal?.diameter
 
-  constructorStore.uploadedStlFileUrl = newVal!.stl_file
+  constructorStore.uploadedStlFileUrl = newVal!.stl_file_url
 
   if (newVal?.diameter) {
     constructorStore.xSize = undefined

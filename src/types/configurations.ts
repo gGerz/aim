@@ -1,6 +1,6 @@
 export interface IDraft {
   id: number
-  stl_file: string
+  stl_file_url: string
   is_saved: false
   machine_type: number
   control_system: number

@@ -104,7 +104,7 @@ const createConfiguration = async (isDraft: boolean) => {
     y_size: constructorStore.ySize,
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
-    stl_file: constructorStore.uploadedStlFileUrl,
+    stl_file_url: constructorStore.uploadedStlFileUrl,
     is_draft: isDraft
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
