@@ -1,7 +1,7 @@
 <template>
   <header class="header">
     <div class="header__logo">
-      <img src="@/assets/logo.svg" alt="Logo" />
+      <img src="@/assets/logo.svg" alt="Logo" @click="router.push('/')" />
     </div>
     <div class="header__nav">
       <AimButton v-if="authStore.isAuthenticated" @click="onLogout">Выйти</AimButton>
@@ -17,13 +17,6 @@ import { useAuthStore } from '@/store/authStore';
 import http from '@/services/http';
 import Cookies from 'js-cookie';
 const authStore = useAuthStore()
-
-const goToHelp = () => {
-
-}
-const goToAbout = () => {
-
-}
 const onLogout = () => {
   http.post('logout/', {
     access: Cookies.get('access_token'),
@@ -49,6 +42,7 @@ const onLogout = () => {
   height: 60px;
   z-index: 2;
   &__logo {
+  cursor: pointer;
 
     img {
       height: 40px;

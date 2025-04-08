@@ -16,7 +16,7 @@
         </div>
       </div>
       <div class="constructor__row">
-        <div  class="constructor__label">
+        <div class="constructor__label">
           <span>Выберите тип стойки</span>
           <RadioGroup v-model:value="constructorStore.standType">
             <RadioButton v-for="control in constructorStore.machineType?.controls" :key="control.id" :value="control">{{control.name}}</RadioButton>
@@ -88,13 +88,13 @@
 </template>
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
-import { Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
-import { computed, onMounted, watch } from 'vue';
+import { Tooltip, Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
+import { computed, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
 import { useConstructorStore } from '@/stores/constructor';
-
+import Loader from '@/components/Loader.vue';
 export type ICreatePayload = {
   machine_type?: IConfiguration,
   control_system?: IControl,
@@ -111,6 +111,7 @@ type Emits = {
 type Props = {
   draft?: IDraft
   configuration?: IConfiguration[]
+  loading: boolean
 }
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
@@ -246,6 +247,7 @@ const isDisabled = computed(() =>  {
     display: flex;
     flex-direction: column;
     gap: 12px;
+    position: relative;
 
     &:after {
       display: none;

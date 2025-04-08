@@ -68,7 +68,7 @@ const onAuthClick = () => {
       description: 'Попробуйте ввести другой логин или пароль'
     })
   }).finally(() => {
-    // isLoading.value = false
+    isLoading.value = false
   })
 }
 

@@ -6,7 +6,7 @@
         Рекомендуемые инструменты
       </div>
     </template>
-    <List class="tools__list" :data-source="tools">
+    <List class="tools__list" :data-source="tools" :loading="false">
       <template #renderItem="{ item }">
         <ListItem>
           <template #actions>
@@ -25,33 +25,29 @@
   </Card>
 </template>
 <script lang="ts" setup>
+import { useConstructorStore } from '@/stores/constructor';
 import type { ITool } from '@/types/configurations';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, List, ListItem } from 'ant-design-vue';
-import { ref } from 'vue';
 type Props = {
   tools: ITool[]
+  loading: boolean
 }
 type Emits = {
   'on-start-click': []
   'on-back-click': []
 }
-const props = defineProps<Props>()
+defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const toolsList = ref([
-  'Инструмент 1',
-  'Инструмент 2',
-  'Инструмент 3',
-  'Инструмент 4',
-])
-
+const { resetStore } = useConstructorStore()
 
 const onBackClick = () => {
   emit('on-back-click')
 }
 
 const onStartClick = () => {
+  resetStore()
   emit('on-start-click')
 }
 
@@ -87,6 +83,10 @@ const onStartClick = () => {
     padding: 8px 24px 0;
   }
 
+  &__list {
+    height: 498px;
+  }
+
   ::v-deep(.ant-card-head) {
     color: var(--color-white);
     border-color: var(--color-orange);
@@ -110,9 +110,8 @@ const onStartClick = () => {
     gap: 8px;
     padding: 24px;
     margin-top: 2px;
-    max-height: 498px;
-    min-height: 498px;
     overflow-y: auto;
+    height: 507px;
   }
   ::v-deep(.ant-list-item) {
     background: var(--color-orange);

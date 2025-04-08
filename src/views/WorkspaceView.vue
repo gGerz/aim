@@ -11,6 +11,7 @@
           />
           <div class="workspace-view__first">
             <Constructor
+              :loading="configurationDataLoading"
               ref="constructorRef"
               :draft="currentDraftData"
               :configuration="configurationData"
@@ -20,8 +21,11 @@
           </div>
         </template>
         <div class="workspace-view__second" v-if="currentStep === 2">
-          <Tools :tools="tools"  @on-back-click="goToPrevStep" @on-start-click="showModal"/>
+          <Tools :loading="toolsLoading" :tools="tools"  @on-back-click="currentStep--" @on-start-click="showModal"/>
           <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
+        </div>
+        <div class="workspace-view__third" v-if="currentStep === 3">
+          <GCode @on-back-click="currentStep--"/>
         </div>
       </div>
     </div>
@@ -40,28 +44,21 @@
 
 <script lang="ts" setup>
 import Actions from '@/components/workspace/Actions.vue';
-import Constructor, { type ICreatePayload } from '@/components/workspace/Constructor.vue';
+import Constructor from '@/components/workspace/Constructor.vue';
 import ChatWindow from '@/components/workspace/chat/ChatWindow.vue';
 import Tools from '@/components/workspace/Tools.vue';
 import ModelViewer from '@/components/workspace/ModelViewer.vue';
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted } from 'vue';
 import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
 import type { IConfiguration, IDraft, ITool } from '@/types/configurations';
 import { useConstructorStore } from '@/stores/constructor';
-
+import GCode from '@/components/workspace/GCode.vue';
 const constructorStore = useConstructorStore()
 const currentStep = ref(1)
 const tools = ref<ITool[]>([])
-
-const goToNextStep = async () => {
-  currentStep.value = 2
-}
-
-const goToPrevStep = () => {
-  currentStep.value = 1
-}
+const toolsLoading = ref(false)
 
 const open = ref<boolean>(false);
 const draftList = ref<IDraft[]>([]);
@@ -71,6 +68,7 @@ const currentDraftIndex = ref<number | null>(null)
 const constructorRef = ref(null)
 
 const configurationData = ref<IConfiguration[]>()
+const configurationDataLoading = ref(false)
 
 const showModal = () => {
   open.value = true;
@@ -78,21 +76,27 @@ const showModal = () => {
 
 const onModalAccept = () => {
   open.value = false;
-};
+  currentStep.value = 3
+}
 
 const onModalCancel = () => {
   open.value = false;
 };
 
 const loadConfigurations = () => {
+  configurationDataLoading.value = true
   http.get<IConfiguration[]>('configurations/types-with-controls/').then((res) => {
-    console.log('loadConfigurations', res )
     configurationData.value = res.data
+  }).finally(() => {
+    configurationDataLoading.value = false
   })
 }
 const loadTools = (machineTypeId: number) => {
+  toolsLoading.value = true
   http.get<ITool[]>('configurations/tools/', { params: { machine_type_id: machineTypeId } }).then((res) => {
     tools.value = res.data
+  }).finally(() => {
+    toolsLoading.value = false
   })
 }
 
@@ -124,11 +128,17 @@ const saveConfiguration = async () => {
     })
   }).catch((err) => {
     const errObj = err.response.data
-    Object.keys(errObj).forEach(key => {
+    if (errObj['non_field_errors']) {
+      notification.error({
+        message: `${errObj['non_field_errors']}`,
+      })
+    } else {
+      Object.keys(errObj).forEach(key => {
       notification.error({
         message: `${key}: ${errObj[key]}`,
       })
     });
+    }
   })
 
 }
@@ -153,7 +163,7 @@ const clearAllConfigurations = () => {
 const onCreateConfiguration = () => {
   createConfiguration(false).then(() => {
     loadTools(constructorStore.machineType!.id)
-    goToNextStep()
+    currentStep.value++
   })
 }
 

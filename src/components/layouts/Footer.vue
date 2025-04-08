@@ -3,10 +3,9 @@
     <div class="footer__content">
       <p>AIM V1.0</p>
       <div class="links">
-        <a href="/privacy-policy">Помощь</a>
-        <a href="/terms-of-service">О проекте</a>
-        <a href="/privacy-policy">Политика конфиденциальности</a>
-        <a href="/terms-of-service">Пользовательское соглашение</a>
+        <a href="/aim/help.pdf" target="_blank">Помощь</a>
+        <a href="/aim/policy.pdf" target="_blank">Политика конфиденциальности</a>
+        <a href="/aim/agreements.pdf" target="_blank">Пользовательское соглашение</a>
       </div>
     </div>
   </footer>
