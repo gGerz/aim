@@ -12,21 +12,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref } from 'vue';
+import {  onBeforeMount, onBeforeUnmount } from 'vue';
 import ChatMessages from './ChatMessages.vue';
 import ChatInput from './ChatInput.vue';
 import { Card } from 'ant-design-vue';
 import { RobotOutlined } from '@ant-design/icons-vue';
-import type { IMessage } from '@/types/messages';
+import { useWebSocket } from '@/composables/useWebsocket';
 
-const messages = ref<IMessage[]>([
-  { id: 1, text: 'Привет! Я робот, не бойся меня, я друг! Я тебя не обижу, давай сидеть и смотреть друг другу в глаза. Спроси меня любой вопрос и я постараюсь тебе на него ответить!', sender: 'bot' },
-  { id: 2, text: 'Как дела?', sender: 'user' },
-]);
+const { connect, send, messages, disconnect } = useWebSocket(import.meta.env.VITE_WS_URL)
+
+onBeforeMount(() => {
+  connect()
+})
+
+onBeforeUnmount(() => {
+  disconnect()
+})
 
 const handleSendMessage = (message: string) => {
-  messages.value.push({ id: Date.now(), text: message, sender: 'user' });
+  messages.value.push({ message , isMy: true})
+  send({ type: 'chat_message', message })
 };
+
 </script>
 
 <style lang="scss" scoped>

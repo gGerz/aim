@@ -4,12 +4,15 @@
       Модель заготовки
     </template>
     <div>
+      {{ fileExtension }}
     Предварительный расчет времени:
     <br> <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
     <model-stl
+    v-if="fileExtension === 'stl'"
       :backgroundAlpha="0.5"
       :src="stlFile"
     />
+    <img class="model-viewer__wip" src="@/assets/wip.webp" alt="Work in Progress"  />
     </div>
   </Card>
 </template>
@@ -17,12 +20,17 @@
 import stlFile from '@/assets/uzor.stl'
 import { ModelStl  } from 'vue-3d-model';
 import { Card } from 'ant-design-vue';
-import { reactive } from 'vue'
+import { computed, reactive } from 'vue'
 
 type Props = {
   stlUrl: string
 }
-defineProps<Props>()
+const props = defineProps<Props>()
+
+const fileExtension = computed(() => {
+
+  return props.stlUrl.split('.').pop()?.toLowerCase()
+})
 
 
 const rotation = reactive({
@@ -53,6 +61,10 @@ function rotate() {
   &__time {
     font-size: 24px;
     font-weight: 600;
+  }
+
+  &__wip {
+    width: 100%;
   }
 
   ::v-deep(.ant-card-head) {

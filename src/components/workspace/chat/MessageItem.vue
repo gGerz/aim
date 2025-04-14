@@ -1,6 +1,10 @@
 <template>
-  <div :class="['message-item', message.sender]">
-    {{ message.text }}
+  <div :class="{
+    'message-item': true,
+    'user': message.isMy,
+    'bot': !message.isMy,
+  }">
+    {{ message.message }}
   </div>
 </template>
 

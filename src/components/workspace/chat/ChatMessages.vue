@@ -1,6 +1,6 @@
 <template>
   <div class="chat-messages" ref="messagesContainer">
-    <MessageItem v-for="msg in messages" :key="msg.id" :message="msg"  />
+    <MessageItem v-for="(msg, index) in messages" :key="index" :message="msg"  />
   </div>
 </template>
 
