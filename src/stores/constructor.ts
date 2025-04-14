@@ -15,8 +15,6 @@ export const useConstructorStore = defineStore('constructor', () => {
   const isDiameterEnabled = ref(false)
 
   const resetStore = () => {
-    machineType.value = undefined
-    standType.value = undefined
     xSize.value = undefined
     ySize.value = undefined
     zSize.value = undefined
@@ -38,6 +36,6 @@ export const useConstructorStore = defineStore('constructor', () => {
     isUploadErrorExist,
     isFileUploaded,
     isDiameterEnabled,
-    resetStore
+    resetStore,
   }
 })

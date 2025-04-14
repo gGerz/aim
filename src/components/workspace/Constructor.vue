@@ -79,7 +79,7 @@
       </div>
     </div>
     <div class="constructor__file">
-      <UploadDragger :maxCount="1" :showUploadList="false" accept=".stl" :customRequest="uploadSTL">
+      <UploadDragger :maxCount="1" :showUploadList="false" accept=".stl,.stp,.step,.dxf,.pfd" :customRequest="uploadSTL">
         {{fileUploadText}}
       </UploadDragger>
     </div>
@@ -94,7 +94,6 @@ import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
 import { useConstructorStore } from '@/stores/constructor';
-import Loader from '@/components/Loader.vue';
 export type ICreatePayload = {
   machine_type?: IConfiguration,
   control_system?: IControl,

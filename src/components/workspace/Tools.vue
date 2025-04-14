@@ -6,6 +6,9 @@
         Рекомендуемые инструменты
       </div>
     </template>
+    <div class="tools__attention">
+      Обратите внимание, инструменты не подлежат изменению!
+    </div>
     <List class="tools__list" :data-source="tools" :loading="false">
       <template #renderItem="{ item }">
         <ListItem>
@@ -16,16 +19,9 @@
         </ListItem>
       </template>
     </List>
-    <div class="tools__attention">
-      Обратите внимание, инструменты не подлежат изменению!
-    </div>
-    <div class="tools__controls">
-      <AimButton size="big" @click="onStartClick">Создать код</AimButton>
-    </div>
   </Card>
 </template>
 <script lang="ts" setup>
-import { useConstructorStore } from '@/stores/constructor';
 import type { ITool } from '@/types/configurations';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Card, List, ListItem } from 'ant-design-vue';
@@ -40,15 +36,8 @@ type Emits = {
 defineProps<Props>()
 const emit = defineEmits<Emits>()
 
-const { resetStore } = useConstructorStore()
-
 const onBackClick = () => {
   emit('on-back-click')
-}
-
-const onStartClick = () => {
-  resetStore()
-  emit('on-start-click')
 }
 
 </script>
@@ -58,6 +47,7 @@ const onStartClick = () => {
   color: var(--color-white);
   border-color: transparent;
   border-radius: 20px;
+  max-height: 815px;
 
   &__title {
     display: flex;
@@ -78,18 +68,22 @@ const onStartClick = () => {
     min-width: 50px;
   }
 
+  &__list {
+    overflow: auto;
+    max-height: 705px;
+  }
+
   &__attention {
     border-top: 1px solid var(--color-orange);
     padding: 8px 24px 0;
   }
 
-  &__list {
-    height: 498px;
-  }
-
   ::v-deep(.ant-card-head) {
     color: var(--color-white);
     border-color: var(--color-orange);
+  }
+  ::v-deep(.ant-list-empty-text) {
+    display: none;
   }
   ::v-deep(.ant-card-body) {
     display: flex;
@@ -108,10 +102,8 @@ const onStartClick = () => {
     display: flex;
     flex-direction: column;
     gap: 8px;
-    padding: 24px;
+    padding: 0 24px 24px;
     margin-top: 2px;
-    overflow-y: auto;
-    height: 507px;
   }
   ::v-deep(.ant-list-item) {
     background: var(--color-orange);

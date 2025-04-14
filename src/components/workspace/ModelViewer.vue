@@ -4,13 +4,12 @@
       Модель заготовки
     </template>
     <div>
+    Предварительный расчет времени:
+    <br> <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
     <model-stl
-        :backgroundAlpha="0.5"
-        :rotation="rotation"
-        @load="onLoad"
-        :src="stlFile"
-      />
-      Предварительный расчет времени: <br> <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
+      :backgroundAlpha="0.5"
+      :src="stlFile"
+    />
     </div>
   </Card>
 </template>
@@ -61,6 +60,7 @@ function rotate() {
     border-color: var(--color-orange);
   }
   ::v-deep(.ant-card-body) {
+    padding: 12px 24px;
     display: flex;
     flex-direction: column;
     gap: 12px;

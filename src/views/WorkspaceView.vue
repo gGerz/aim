@@ -15,17 +15,17 @@
               ref="constructorRef"
               :draft="currentDraftData"
               :configuration="configurationData"
-              @on-start-click="onCreateConfiguration"
+              @on-start-click="showModal"
             />
             <ChatWindow/>
           </div>
         </template>
         <div class="workspace-view__second" v-if="currentStep === 2">
-          <Tools :loading="toolsLoading" :tools="tools"  @on-back-click="currentStep--" @on-start-click="showModal"/>
-          <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
-        </div>
-        <div class="workspace-view__third" v-if="currentStep === 3">
-          <GCode @on-back-click="currentStep--"/>
+          <Tools :loading="toolsLoading" :tools="tools"  @on-back-click="currentStep--"/>
+          <div class="workspace-view__second-items">
+            <GCode :gCode="gCodeData?.gcode || ''"/>
+            <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
+          </div>
         </div>
       </div>
     </div>
@@ -52,7 +52,7 @@ import { ref, onMounted } from 'vue';
 import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
-import type { IConfiguration, IDraft, ITool } from '@/types/configurations';
+import type { IConfiguration, IDraft, IGcode, ITool } from '@/types/configurations';
 import { useConstructorStore } from '@/stores/constructor';
 import GCode from '@/components/workspace/GCode.vue';
 const constructorStore = useConstructorStore()
@@ -70,13 +70,15 @@ const constructorRef = ref(null)
 const configurationData = ref<IConfiguration[]>()
 const configurationDataLoading = ref(false)
 
+const gCodeData = ref<IGcode | null>(null)
+
 const showModal = () => {
   open.value = true;
 };
 
 const onModalAccept = () => {
   open.value = false;
-  currentStep.value = 3
+  onCreateConfiguration()
 }
 
 const onModalCancel = () => {
@@ -100,7 +102,7 @@ const loadTools = (machineTypeId: number) => {
   })
 }
 
-const createConfiguration = async (isDraft: boolean) => {
+const createDraft = async () => {
   const payload = {
     machine_type: constructorStore.machineType!.id,
     control_system: constructorStore.standType!.id,
@@ -109,7 +111,7 @@ const createConfiguration = async (isDraft: boolean) => {
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
-    is_draft: isDraft
+    is_draft: true
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return http.postFormData<any>('configurations/', payload)
@@ -121,7 +123,7 @@ const loadDrafts = () => {
 }
 
 const saveConfiguration = async () => {
-  createConfiguration(true).then((res) => {
+  createDraft().then((res) => {
     draftList.value.push(res.data)
     notification.success({
       message: 'Черновик успешно сохранен',
@@ -160,11 +162,28 @@ const clearAllConfigurations = () => {
   })
 }
 
-const onCreateConfiguration = () => {
-  createConfiguration(false).then(() => {
-    loadTools(constructorStore.machineType!.id)
-    currentStep.value++
+
+const createGCode = async () => {
+  const payload = {
+    machine_type: constructorStore.machineType!.id,
+    control_system: constructorStore.standType!.id,
+    x_size: constructorStore.xSize,
+    y_size: constructorStore.ySize,
+    z_size: constructorStore.zSize,
+    diameter: constructorStore.diameter,
+    stl_file_url: constructorStore.uploadedStlFileUrl,
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  http.postFormData<any>('configurations/calculate_gcode/', payload).then((res) => {
+    gCodeData.value = res.data
   })
+}
+
+const onCreateConfiguration = async () => {
+  loadTools(constructorStore.machineType!.id)
+  await createGCode()
+  currentStep.value = 2
+  constructorStore.resetStore()
 }
 
 onMounted(() => {
@@ -227,6 +246,12 @@ onMounted(() => {
     display: grid;
     gap: 20px;
     grid-template-columns: 1fr 1fr;
+
+    &-items {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
 
     @media (max-width: 960px) {
       grid-template-columns: 1fr;

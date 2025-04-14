@@ -30,3 +30,9 @@ export interface IConfiguration {
   name: string
   controls: IControl[]
 }
+
+export interface IGcode {
+  gcode: string;
+  message: string;
+  saved: boolean
+}
