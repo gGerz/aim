@@ -34,6 +34,8 @@ export function useWebSocket(url: string, protocols: string[] = []): UseWebSocke
     socket.value.onmessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data) as IMessage
+        /* eslint-disable-next-line @typescript-eslint/ban-ts-comment */
+        // @ts-ignore
         messages.value.push(data)
         lastMessage.value = data
       } catch (e) {

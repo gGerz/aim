@@ -130,6 +130,7 @@ const onStartClick = () => {
   emit('on-start-click', payload)
 }
 
+// @ts-ignore
 const uploadSTL = (options) => {
   const { file, onSuccess, onError } = options;
   constructorStore.isFileUploaded = true

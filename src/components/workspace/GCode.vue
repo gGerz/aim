@@ -31,6 +31,7 @@ const downloadGcode = () => {
 
   // Получаем текущую дату и время
   const now = new Date()
+  // @ts-ignore
   const pad = (n) => n.toString().padStart(2, '0')
   const formattedDate = `${pad(now.getDate())}.${pad(now.getMonth() + 1)}.${now.getFullYear().toString().slice(-2)} ${pad(now.getHours())}:${pad(now.getMinutes())}`
 
