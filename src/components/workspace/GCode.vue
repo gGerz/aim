@@ -8,7 +8,7 @@
       <AimButton :is-full-width="false" color="orange" @click="downloadGcode">Скачать файл</AimButton>
       </div>
     </template>
-    <div class="g-code__content" >
+    <div class="g-code__content">
       <pre v-html="gCode"></pre>
     </div>
   </Card>
@@ -65,6 +65,15 @@ const downloadGcode = () => {
     }
   }
 
+  &__content {
+    overflow: auto;
+    height: 600px;
+
+    ::v-deep(pre) {
+      margin: 0;
+    }
+  }
+
   ::v-deep(.ant-card-head) {
     color: var(--color-white);
     border-color: var(--color-orange);
@@ -73,10 +82,9 @@ const downloadGcode = () => {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    overflow: auto;
     margin-top: 1px;
-    height: 300px;
-    padding: 12px 24px;
+    height: 610px;
+    padding: 12px 0 20px 24px;
 
     &:after {
       display: none;

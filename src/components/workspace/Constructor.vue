@@ -25,6 +25,15 @@
       </div>
       <div class="constructor__row">
         <div class="constructor__label">
+          <span>Выберите тип материала</span>
+          <RadioGroup v-model:value="selectedMaterial">
+            <RadioButton v-for="material in materials"
+               :key="material.id" :value="material">{{material.name}}</RadioButton>
+          </RadioGroup>
+        </div>
+      </div>
+      <div class="constructor__row">
+        <div class="constructor__label">
           <span>Размеры по диаметру</span>
           <div>
             <Switch v-model:checked="constructorStore.isDiameterEnabled"/>
@@ -89,7 +98,7 @@
 <script lang="ts" setup>
 import AimButton from '@/ui/buttons/AimButton.vue';
 import { Tooltip, Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
-import { computed, watch } from 'vue';
+import { computed, ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
 import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
 import http from '@/services/http';
@@ -114,6 +123,16 @@ type Props = {
 }
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
+
+const selectedMaterial = ref()
+const materials = ref([
+  {id: 1, type: '1', name: 'Сталь' },
+  {id: 2, type: '2', name: 'Алюминий' },
+  {id: 3, type: '3', name: 'Нержавеющая сталь' },
+  {id: 4, type: '4', name: 'Медь' },
+  {id: 5, type: '5', name: 'Бронза' },
+  {id: 6, type: '6', name: 'Чугун' }
+])
 
 const constructorStore = useConstructorStore()
 

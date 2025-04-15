@@ -90,6 +90,7 @@ const onBackClick = () => {
     flex-direction: column;
     gap: 12px;
     padding: 0;
+    height: 680px;
 
     &:after {
       display: none;

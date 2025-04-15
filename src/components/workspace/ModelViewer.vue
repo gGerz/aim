@@ -1,9 +1,11 @@
 <template>
   <Card class="model-viewer">
-    <template #title>
+    Предварительный расчет времени:
+    <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
+    <!-- <template #title>
       Модель заготовки
-    </template>
-    <div>
+    </template> -->
+    <!-- <div>
       {{ fileExtension }}
     Предварительный расчет времени:
     <br> <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
@@ -13,7 +15,7 @@
       :src="stlFile"
     />
     <img class="model-viewer__wip" src="@/assets/wip.webp" alt="Work in Progress"  />
-    </div>
+    </div> -->
   </Card>
 </template>
 <script lang="ts" setup>
@@ -74,7 +76,8 @@ function rotate() {
   ::v-deep(.ant-card-body) {
     padding: 12px 24px;
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
+    align-items: center;
     gap: 12px;
 
     &:after {

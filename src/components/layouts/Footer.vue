@@ -52,4 +52,21 @@
     }
   }
 }
+
+@media (max-width: 768px) {
+  .footer {
+    &__content {
+      padding: 8px;
+      flex-direction: column-reverse;
+      gap: 12px;
+
+      .links {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        margin: 0;
+      }
+    }
+  }
+}
 </style>

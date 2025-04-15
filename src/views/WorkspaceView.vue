@@ -23,8 +23,8 @@
         <div class="workspace-view__second" v-if="currentStep === 2">
           <Tools :loading="toolsLoading" :tools="tools"  @on-back-click="currentStep--"/>
           <div class="workspace-view__second-items">
-            <GCode :gCode="gCodeData?.gcode || ''"/>
             <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
+            <GCode :gCode="gCodeData?.gcode || ''"/>
           </div>
         </div>
       </div>
