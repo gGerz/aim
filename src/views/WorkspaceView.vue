@@ -101,6 +101,13 @@ const loadTools = (machineTypeId: number) => {
     toolsLoading.value = false
   })
 }
+const loadMaterials = () => {
+  toolsLoading.value = true
+  http.get<ITool[]>('materials/').then((res) => {
+    console.log('res', res)
+  }).finally(() => {
+  })
+}
 
 const createDraft = async () => {
   const payload = {
@@ -111,7 +118,8 @@ const createDraft = async () => {
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
-    is_draft: true
+    is_draft: true,
+    material: 1,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return http.postFormData<any>('configurations/', payload)
@@ -129,20 +137,25 @@ const saveConfiguration = async () => {
       message: 'Черновик успешно сохранен',
     })
   }).catch((err) => {
-    const errObj = err.response.data
-    if (errObj['non_field_errors']) {
-      notification.error({
-        message: `${errObj['non_field_errors']}`,
-      })
+    if (err.status === 400) {
+      const errObj = err.response.data
+      if (errObj['non_field_errors']) {
+        notification.error({
+          message: `${errObj['non_field_errors']}`,
+        })
+      } else {
+        Object.keys(errObj).forEach(key => {
+        notification.error({
+          message: `${key}: ${errObj[key]}`,
+        })
+      });
+      }
     } else {
-      Object.keys(errObj).forEach(key => {
       notification.error({
-        message: `${key}: ${errObj[key]}`,
+        message: `Что-то пошло не так...`,
       })
-    });
-    }
-  })
-
+    }}
+  )
 }
 const changeDraft = () => {
   const tmpIndex = currentDraftIndex.value === null ? -1 : currentDraftIndex.value
@@ -172,23 +185,27 @@ const createGCode = async () => {
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
+    material: 1,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  http.postFormData<any>('configurations/calculate_gcode/', payload).then((res) => {
+  return http.postFormData<any>('configurations/calculate_gcode/', payload).then((res) => {
     gCodeData.value = res.data
   })
 }
 
 const onCreateConfiguration = async () => {
   loadTools(constructorStore.machineType!.id)
-  await createGCode()
-  currentStep.value = 2
-  constructorStore.resetStore()
+  createGCode().then((e) => {
+    currentStep.value = 2
+    constructorStore.resetStore()
+  }).catch((e) => {
+  })
 }
 
 onMounted(() => {
   loadConfigurations()
   loadDrafts()
+  loadMaterials()
 })
 
 </script>
