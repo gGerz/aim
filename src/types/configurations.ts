@@ -4,6 +4,7 @@ export interface IDraft {
   is_saved: false
   machine_type: number
   control_system: number
+  material: number
   x_size: number
   y_size: number
   z_size: number
@@ -32,7 +33,13 @@ export interface IConfiguration {
 }
 
 export interface IGcode {
-  gcode: string;
-  message: string;
+  gcode: string
+  message: string
+  readyTime: number
   saved: boolean
+}
+
+export interface IMaterial {
+  id: number
+  name: string
 }

@@ -15,6 +15,7 @@
               ref="constructorRef"
               :draft="currentDraftData"
               :configuration="configurationData"
+              :materials="materials"
               @on-start-click="showModal"
             />
             <ChatWindow/>
@@ -23,8 +24,8 @@
         <div class="workspace-view__second" v-if="currentStep === 2">
           <Tools :loading="toolsLoading" :tools="tools"  @on-back-click="currentStep--"/>
           <div class="workspace-view__second-items">
-            <ModelViewer :stl-url="constructorStore.uploadedStlFileUrl"/>
-            <GCode :gCode="gCodeData?.gcode || ''"/>
+            <ModelViewer :gCodeData="gCodeData" :stl-url="constructorStore.uploadedStlFileUrl"/>
+            <GCode :data="gCodeData"/>
           </div>
         </div>
       </div>
@@ -52,7 +53,7 @@ import { ref, onMounted } from 'vue';
 import { Modal, notification } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
 import http from '@/services/http';
-import type { IConfiguration, IDraft, IGcode, ITool } from '@/types/configurations';
+import type { IConfiguration, IDraft, IGcode, IMaterial, ITool } from '@/types/configurations';
 import { useConstructorStore } from '@/stores/constructor';
 import GCode from '@/components/workspace/GCode.vue';
 const constructorStore = useConstructorStore()
@@ -70,7 +71,14 @@ const constructorRef = ref(null)
 const configurationData = ref<IConfiguration[]>()
 const configurationDataLoading = ref(false)
 
-const gCodeData = ref<IGcode | null>(null)
+const materials = ref<IMaterial[]>([])
+
+const gCodeData = ref<IGcode>({
+  gcode: '',
+  saved: false,
+  message: '',
+  readyTime: 0
+})
 
 const showModal = () => {
   open.value = true;
@@ -102,9 +110,8 @@ const loadTools = (machineTypeId: number) => {
   })
 }
 const loadMaterials = () => {
-  toolsLoading.value = true
   http.get<ITool[]>('materials/').then((res) => {
-    console.log('res', res)
+    materials.value = res.data
   }).finally(() => {
   })
 }
@@ -119,7 +126,7 @@ const createDraft = async () => {
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
     is_draft: true,
-    material: 1,
+    material: constructorStore.material!.id,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return http.postFormData<any>('configurations/', payload)
@@ -134,7 +141,7 @@ const saveConfiguration = async () => {
   createDraft().then((res) => {
     draftList.value.push(res.data)
     notification.success({
-      message: 'Черновик успешно сохранен',
+      message: 'Черновик успешно сохранен!',
     })
   }).catch((err) => {
     if (err.status === 400) {
@@ -185,7 +192,7 @@ const createGCode = async () => {
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
-    material: 1,
+    material: constructorStore.material!.id,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return http.postFormData<any>('configurations/calculate_gcode/', payload).then((res) => {

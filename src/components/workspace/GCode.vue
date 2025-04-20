@@ -4388,14 +4388,16 @@ M30
 <script lang="ts" setup>
 import { Card } from 'ant-design-vue';
 import AimButton from '@/ui/buttons/AimButton.vue';
+import { computed } from 'vue';
+import type { IGcode } from '@/types/configurations';
 
 interface IProps {
-  gCode: string
+  data: IGcode
 }
 const props = defineProps<IProps>()
 
 const downloadGcode = () => {
-  const blob = new Blob([props.gCode], { type: 'text/plain;charset=utf-8' })
+  const blob = new Blob([props.data.gcode], { type: 'text/plain;charset=utf-8' })
   const url = URL.createObjectURL(blob)
 
   const link = document.createElement('a')
@@ -4415,6 +4417,7 @@ const downloadGcode = () => {
 
   URL.revokeObjectURL(url)
 }
+
 
 </script>
 

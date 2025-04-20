@@ -1,10 +1,11 @@
 import { ref } from 'vue'
 import { defineStore } from 'pinia'
-import type { IConfiguration, IControl } from '@/types/configurations'
+import type { IConfiguration, IControl, IMaterial } from '@/types/configurations'
 
 export const useConstructorStore = defineStore('constructor', () => {
   const machineType = ref<IConfiguration>()
   const standType = ref<IControl>()
+  const material = ref<IMaterial>()
   const xSize = ref<number>()
   const ySize = ref<number>()
   const zSize = ref<number>()
@@ -28,6 +29,7 @@ export const useConstructorStore = defineStore('constructor', () => {
   return {
     machineType,
     standType,
+    material,
     xSize,
     ySize,
     zSize,

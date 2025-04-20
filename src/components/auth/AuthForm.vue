@@ -33,10 +33,12 @@ import { useAuthStore } from '@/store/authStore';
 
 const authStore = useAuthStore();
 
+const isDev = import.meta.env.DEV === true
+
 const isLoading = ref(false)
 const authForm = ref({
-  userName: 'german1',
-  password: '123456qW!'
+  userName: isDev ? 'german1' : '',
+  password: isDev ? '123456qW!' : ''
 })
 
 const isButtonDisabled = computed(() => !authForm.value.password || !authForm.value.userName)

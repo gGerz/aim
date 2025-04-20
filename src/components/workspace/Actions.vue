@@ -29,4 +29,9 @@ withDefaults(defineProps<IProps>(), {
   grid-template-columns: 1fr 1fr 1fr;
   grid-gap: 12px;
 }
+ @media (max-width: 776px) {
+  .actions {
+    grid-template-columns: 1fr;
+  }
+ }
 </style>

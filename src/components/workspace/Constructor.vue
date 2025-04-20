@@ -26,7 +26,7 @@
       <div class="constructor__row">
         <div class="constructor__label">
           <span>Выберите тип материала</span>
-          <RadioGroup v-model:value="selectedMaterial">
+          <RadioGroup v-model:value="constructorStore.material">
             <RadioButton v-for="material in materials"
                :key="material.id" :value="material">{{material.name}}</RadioButton>
           </RadioGroup>
@@ -100,7 +100,7 @@ import AimButton from '@/ui/buttons/AimButton.vue';
 import { Tooltip, Card, UploadDragger, InputNumber, RadioButton, RadioGroup, notification, Switch } from 'ant-design-vue';
 import { computed, ref, watch } from 'vue';
 import { QuestionCircleOutlined } from '@ant-design/icons-vue';
-import type { IConfiguration, IControl, IDraft } from '@/types/configurations';
+import type { IConfiguration, IControl, IDraft, IMaterial } from '@/types/configurations';
 import http from '@/services/http';
 import { useConstructorStore } from '@/stores/constructor';
 export type ICreatePayload = {
@@ -119,20 +119,11 @@ type Emits = {
 type Props = {
   draft?: IDraft
   configuration?: IConfiguration[]
+  materials?: IMaterial[]
   loading: boolean
 }
 const emit = defineEmits<Emits>()
 const props = defineProps<Props>()
-
-const selectedMaterial = ref()
-const materials = ref([
-  {id: 1, type: '1', name: 'Сталь' },
-  {id: 2, type: '2', name: 'Алюминий' },
-  {id: 3, type: '3', name: 'Нержавеющая сталь' },
-  {id: 4, type: '4', name: 'Медь' },
-  {id: 5, type: '5', name: 'Бронза' },
-  {id: 6, type: '6', name: 'Чугун' }
-])
 
 const constructorStore = useConstructorStore()
 
@@ -200,6 +191,10 @@ watch(() => props.configuration, (newVal) => {
   constructorStore.standType = newVal?.[0].controls?.[0]
 })
 
+watch(() => props.materials, (newVal) => {
+  constructorStore.material = newVal?.[0]
+})
+
 watch(() => constructorStore.machineType, (newVal) => {
   const findStand = newVal?.controls.find((control) => control.type === constructorStore.standType?.type)
   if (!!findStand) {
@@ -215,6 +210,8 @@ watch(() => props.draft, (newVal) => {
   const standIndex = props.configuration?.findIndex((conf) => conf.id === newVal?.machine_type) || 0
 
   constructorStore.standType = props.configuration?.[standIndex].controls.find((control) => control.id === newVal?.control_system)
+
+  constructorStore.material = props.materials?.find((mat) => mat.id === newVal?.material)
 
   constructorStore.isDiameterEnabled = !!newVal?.diameter
 

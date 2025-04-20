@@ -1,7 +1,12 @@
 <template>
   <Card class="model-viewer">
     Предварительный расчет времени:
-    <span class="model-viewer__time">15</span> минут <span class="model-viewer__time">50</span> cекунд
+    <div class="model-viewer__timer">
+      <div v-if="timer.days"><span class="model-viewer__time">{{timer.days}}</span> д</div>
+      <div v-if="timer.hours"><span class="model-viewer__time">{{timer.hours}}</span> ч</div>
+      <div v-if="timer.minutes"><span class="model-viewer__time">{{timer.minutes}}</span> м</div>
+      <div v-if="timer.seconds"><span class="model-viewer__time">{{timer.seconds}}</span> c</div>
+    </div>
     <!-- <template #title>
       Модель заготовки
     </template> -->
@@ -23,9 +28,11 @@ import stlFile from '@/assets/uzor.stl'
 import { ModelStl  } from 'vue-3d-model';
 import { Card } from 'ant-design-vue';
 import { computed, reactive } from 'vue'
+import type { IGcode } from '@/types/configurations';
 
 type Props = {
   stlUrl: string
+  gCodeData: IGcode
 }
 const props = defineProps<Props>()
 
@@ -51,6 +58,24 @@ function rotate() {
 }
 
 
+const convertSeconds = (seconds: number) => {
+  const days = Math.floor(seconds / (24 * 3600));
+  seconds %= 24 * 3600;
+  const hours = Math.floor(seconds / 3600);
+  seconds %= 3600;
+  const minutes = Math.floor(seconds / 60);
+  seconds %= 60;
+
+  return {
+    days,
+    hours,
+    minutes,
+    seconds,
+  };
+}
+
+const timer = computed(() => convertSeconds(props.gCodeData.readyTime))
+
 </script>
 
 <style lang="scss" scoped>
@@ -60,9 +85,15 @@ function rotate() {
   border-color: transparent;
   border-radius: 20px;
 
+  &__timer {
+    display: flex;
+    gap: 4px;
+  }
+
   &__time {
     font-size: 24px;
     font-weight: 600;
+    display: inline-block;
   }
 
   &__wip {
