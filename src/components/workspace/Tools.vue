@@ -13,7 +13,7 @@
       <template #renderItem="{ item }">
         <ListItem>
           <template #actions>
-            <div class="tools__badge">T8</div>
+            <div class="tools__badge">{{item.slots[0].value}}</div>
           </template>
           <b>{{ item.name }}</b>
         </ListItem>
@@ -63,6 +63,7 @@ const onBackClick = () => {
 
   &__badge {
     background: var(--color-white);
+    color: var(--color-black);
     padding: 8px 12px;
     border-radius: 12px;
     min-width: 50px;

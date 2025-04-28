@@ -125,7 +125,6 @@ const createDraft = async () => {
     z_size: constructorStore.zSize,
     diameter: constructorStore.diameter,
     stl_file_url: constructorStore.uploadedStlFileUrl,
-    is_draft: true,
     material: constructorStore.material!.id,
   }
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
